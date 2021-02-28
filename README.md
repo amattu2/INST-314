@@ -9,7 +9,7 @@ Teachers:
 |Lab|Grade|Notes|
 |:-|:-|:-|
 |lab1|-|Code correct, some documentation issues|
-|lab2|||
+|lab2|87%|Code correct, data visualization complaints|
 
 # Notes
 N/A
