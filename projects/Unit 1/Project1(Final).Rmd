@@ -1,0 +1,294 @@
+---
+title: "Project 1"
+authors: 'Team 0201 #5, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar Randolph'
+date: "03/02/2021"
+output: html_document
+---
+**Title:** Briefing Memorandum
+
+**To:** Dr. Random
+
+**From:** Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu
+
+**Subject:** Analysis of 110 automotive vehicle models from 2015
+
+
+## Background
+The purpose of this analysis is to provide insights into 110 vehicle models available in 2015 from various manufacturers. Aside from providing evaluations of various aspects about this dataset, the goal is to locate trends common between different variables. Our dataset is sourced from www.lock5stat.com/datapage.html and includes a small proportion of all available makes and models from 2015. Although it was compiled by lock5stat.com, the original data was provided by KBB.com in 2015. Of the 110 models listed, 20 variables on each observation are available for interpretation.
+
+## Data Analyses
+
+### Analysis 1: One Quantitative Variable
+#### Analyst: Yiling Du
+
+sign "Cars2015" to cars, and show cars
+```{r}
+cars <- read.csv("~/Downloads/Cars2015.csv", header=T)
+cars
+```
+analyze the Quantitative Variable "CityMPG" (City miles per gallon), get the five number summary, mean, standard deviation, and variance.
+```{r}
+summary(cars$CityMPG)
+sd(cars$CityMPG)
+var(cars$CityMPG)
+
+```
+draw histogram and box plot for CityMPG
+```{r}
+hist(cars$CityMPG, breaks=5, 
+     main = "Distribution of CityMPG",
+     xlab= "CityMPG(City miles per gallon)",
+     ylab= "Number of cars")
+boxplot(cars$CityMPG,
+        main = "Distribution of CityMPG",
+        ylab= "CityMPG(City miles per gallon)")
+```
+Analysis 1 Discussion:
+From the five number summary, and the mean, we can know median < mean, so the distribution is right-skewed. We also can see right-skewed from the histogram easily. We can see there is one prominent peak in the histogram, so it is unimodal. 
+From the box plot, we can see there is an outlier.
+Median and IQR are more robust to skewness than mean and s.d, so in this case, it is more helpful to use median and IQR.
+The median/center is 20, it means 55 cars' City miles per gallon is less than 20, and 55 cars's City miles per gallon is more than 20.
+IQR is good to describe the spread of the database. IQR=Q3-Q1=7, it means the range of the middle 50% of the data span is 7.
+
+
+### Analysis 2: One Categorical Variable
+#### Analyst: Alec Mattu
+
+Lets begin the interpretation by loading the Cars2015.csv file into an accessible variable names cars. After we read the dataset into our environment, we just verify that the data did successfully load by typing `cars` into the console.
+```{r}
+cars <- read.csv("~/Downloads/Cars2015.csv", header=T)
+cars
+```
+
+For this analysis of a single categorical variable, I've chosen to breakdown the vehicle type category. Although I could have picked another categorical variable, such as Size (Sm/Md/Lg) or Drive (FWD/RWD/AWD), I figured it would be neat to take a look at a variable with so many options (Small, Hatchback, Sedan, etc).
+
+Lets begin the core analysis by listing the frequency of the categories in the dataset.
+```{r}
+table(cars$Type)
+```
+
+From the output generated above, we can see that there are 6 categories of vehicles: 7-Passenger, Hatchback, Sedan, Sporty, SUV, and Wagon. Of those categories, the distribution is as such: 7-Passenger (15), Hatchback (11), Sedan (46), Sporty (11), SUV (18), and Wagon (9). 
+
+Let's take a look at a pie chart to visualize the outputs from the above table. First, we will make use of a library called Plyr, which allows us to count the frequency of each type and apply it to the `c()` function easily.
+
+```{r}
+library('plyr')
+```
+
+Then we will call the `count()` function, provided by Plyr.
+```{r}
+freq_table <- count(cars$Type)
+freq_table
+```
+Now that this data is easily split up, we can apply it to the `c()` function and build a pie chart.
+```{r}
+label_colors <- c("wheat1", "violetred4", "yellow2", "grey50", "azure1", "red")
+labels <- c(freq_table$x)
+percentageLabels <- paste(round(freq_table$freq / 110, 1) * 100, "%", sep = "")
+slices <- c(freq_table$freq)
+pie(slices, labels = percentageLabels, main = "Vehicle Type Pie Chart", col = label_colors)
+legend("topright", freq_table$x, fill = label_colors)
+```
+
+From this visualization above, we can easily see that the sedan class dominates the rest of the types. However, this IS a statistics class, so let's get hardcore numbers.
+
+In order to determine the proportion of vehicles in a specific category, we need to calculate the number of vehicles listed in the dataset. A simple call to `nrows()` will give us this number.
+```{r}
+number_of_rows <- nrow(cars)
+number_of_rows
+```
+
+This gives us 110 total rows, which we can verify by adding up the number of vehicles in each type category. Or, we can call `sum(slices)` to verify that every vehicle in the dataset has a type assigned.
+
+```{r}
+sum(slices) == number_of_rows
+```
+
+Now that we've verified that the number of rows/observations equals the number of types counted, we can calculate concrete numbers.
+
+The number of 7-Passenger vehicles in proportion to the 110 figure we found above:
+```{r}
+freq_table$freq[1] / number_of_rows
+```
+This figure indicates that 7-pass vehicles represent ~13.6% of the vehicles apart of the dataset.
+
+Next, we take a look at Hatchback vehicles:
+```{r}
+freq_table$freq[2] / number_of_rows
+```
+Not far off of 7-passenger vehicles, we see that hatchbacks make up 10% of the vehicles in the dataset.
+
+Moving onto sedans, we can anticipate ~40% of the vehicles are comprised of this vehicle type; Let's find out for sure:
+```{r}
+freq_table$freq[3] / number_of_rows
+```
+No surprise here, this was present visually in the graph already. Sedans make up nearly ~42% of the 110 vehicles in the dataset.
+
+Next to the smaller group of vehicle types, we're evaluating the "Sporty", "SUV", and "Wagon" types below.
+
+As with the other types, take the sporty type and divide it by the sum of vehicle type observations.
+```{r}
+freq_table$freq[4] / number_of_rows
+```
+No abnormalities here, the sporty type accounts for 10% of the vehicle dataset sample.
+
+Moving on to the SUV type,
+```{r}
+freq_table$freq[5] / number_of_rows
+```
+Although substantially under the Sedan type, the SUV comes in at just under 17% of the sample. 
+
+Last and it just so happens to be least, the Wagon type makes up a mere 8% of the vehicle types in the dataset. Not exactly a surprise, given the rarity of finding a wagon on the road today.
+```{r}
+freq_table$freq[6] / number_of_rows
+```
+
+Now that we have seen a pie chart and actual representative numbers, let's take a look at the histogram to solidify our analyis.
+
+Let's create the proper data frames to supply to the bar chart functions.
+```{r}
+type_df <- data.frame(x = freq_table$x, y = freq_table$freq)
+type_df
+```
+The table above is no different than the frequency table, with the exception that it's now usable by the bar plot function with
+
+Let's generate the histogram to display the frequency of vehicles in a particular vehicle type category.
+```{r}
+barplot(type_df$y, names.arg = type_df$x)
+```
+
+Of course this graph is no different in utility from the pie chart, but it allows us to see the absolute values of the vehicle types represented in a visual manner. From this, again we can see that the sedan type outnumbers all of the other types, and SUV comes in second place by a very large margin. Based on information gathered from this dataset, it's a safe assumption that passenger vehicles (sedans) make up a large proportion of vehicles on the road in The United States of America.
+
+### Analysis 3: Two Categorical Variables
+#### Analyst:Bryce Hawkins
+
+# 1) Import the "Cars2015.csv" dataset, and assign it to the data "cars".
+cars <- read_csv("Cars2015.csv")
+
+# Get a summary of cars:
+summary(cars)
+
+# 2) Since we are observing two categorical variables, I chose "Make" and "Type" from the dataset. Let's create frequency tables to observe each variable:
+table(cars$Make)
+
+table(cars$Type)
+
+# Observation: From table(cars$Make), we see the frequency of each make of car--31 in total-- ranging from Acura to Volvo. In table(cars$Type), we see the frequency of 6 different types of cars.
+
+# 3) Now let's check the class of these variables to make sure that they are categorical. Each variable returns as "character", so we are moving in the right direction.
+class(cars$Make)
+
+class(cars$Type)
+
+# 4) Because these variables are classified as characters, they will return as "NULL" when trying to observe the levels. To solve this, we will convert the variables from characters to factors:
+cars$Make_updated <- as.factor(cars$Make)
+# Recall new class:
+class(cars$Make_updated)
+
+cars$Type_updated <- as.factor(cars$Type)
+# Recall new class:
+class(cars$Type_updated)
+
+# 5) Now that we have factors, we can observe and assign levels. Let's assign the car makes to "cars$Make_updated" and car types to "cars$Type_updated":
+levels(cars$Make_updated) <- c("Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Fiat", "Ford", "GMC", "Honda", "Hyundai", "Infiniti", "Jaguar", "Jeep", "Kia", "Land Rover", "Lexus", "Lincoln", "Maserati", "Mazda", "Mercedes", "Mitsubishi", "Nissan", "Porche", "Scion", "Subaru", "Toyoto", "Volkswagen", "Volvo")
+
+# Recall level:
+levels(cars$Make_updated)
+
+levels(cars$Type_updated) <- c("7Pass", "Hatchback", "Sedan", "Sporty", "SUV", "Wagon")
+
+# Recall level:
+levels(cars$Type_updated)
+
+# 6) Now, let's create a two-way table to observe both categorical variables. Assign a table of the new variables to "updated":
+updated <- table(cars$Type_updated, cars$Make_updated)
+
+# Recall the new table, "updated":
+updated
+
+# 7) Finally, we want to observe the relationship between both categorical variables. The best way to do this for the dataset is to create a stacked bar chart. Let's go ahead and fill in the blanks and run the stacked bar chart!
+updated_barplot <-barplot(updated, main ="Make of Car & Type of Car", xlab="Make of Car", ylab="Frequency", col= c("red", "orange", "yellow", "green", "blue", "purple"), legend.text= rownames(updated), beside = FALSE)
+
+# Reassign the stacked bar chart to "updated_barplot" and recall it:
+updated_barplot
+
+# Analysis 3 Discussion:
+# 1) We would hypothesize a potential association from the data above because there is a causal relationship between Car Make and Car Type (Car Type is dependent on Car Make).
+
+# 2) To analyze the variables Make and Type, I had to transform each class from character to factor; Reason being is that observing the level of a character class returns as NULL.
+
+# 3) Given the definition of the levels of these variables (Make of cars and Type of car), there does appear to be an association between the two variables; My summaries led to this potential conclusion as the two-way table and stacked bar chart seemlessly fit both of the variables (cars$Make_updated and cars$Type_updated) together.
+
+# 4) The association here appears to be a Categorical-Categorical relationship.
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+
+
+### Analysis 4: One Categorical and One Quantitative Variable
+#### Analyst: Delmar Randolph 
+
+
+Lets begin by loading the Cars2015.csv file into an accessible variable name (d). After we read the dataset into our environment, verify that the data did successfully load by typing `d` into the console.
+
+```{r}
+cars <- file.choose()
+d <- read.csv(cars)
+d
+
+```
+
+Now that we have read the file in question to work with successfully, let's find a categorical variable, as well as a quantitative variable to work with, and create a side-by-side plot. I personally chose to analyze the Quantitative Variable "CityMPG" (City miles per gallon) and the categorical variable "Size" - referencing the size of the vehicle ranging from "small, mid-sized, large"
+
+```{r}
+summary(d$CityMPG)
+```
+
+draw histogram and box plot for CityMPG
+
+```{r}
+hist(d$CityMPG, breaks=5, 
+     main = "Distribution of CityMPG",
+     xlab= "CityMPG(City miles per gallon)",
+     ylab= "Number of cars")
+boxplot(d$CityMPG,
+        main = "Distribution of CityMPG",
+        ylab= "CityMPG(City miles per gallon)")
+```
+I decided to compare this quantitative variable to the vehicle type category. I feel as though the vehicle type plays an integral role in it's CityMPG.
+
+```{R}
+table(d$Size)
+```
+
+Given the output, I believe it would be best to work with the Size of the vehicle from the data. With these three sizes, I will compare the CityMPG of all three and draw conclusions based on the graphs of given the data.
+
+```{R}
+boxplot(d$CityMPG~d$Size)
+boxplot(d$CityMPG~d$Size, xlab="Size", ylab="CityMPG",main="City MPG by Size of Car")
+```
+Based on the side-by-side box plot above, we can see that the smaller the size of the vehicle, the more mileage per gallon in the city it gets. 
+
+### Analysis 5: Two Quantitative Variable
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+
+
+
+## Recommendations
+
+[Add text section with your recommendations here. In this section, you will briefly summarize the most interesting features of your data. Are you seeing any trends, associations, or interesting features? Highlight these and make a recommendation that they be subjected to further statistical analysis. If there isn’t anything interesting, say so!]
+
+
