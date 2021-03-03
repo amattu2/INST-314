@@ -1,7 +1,6 @@
 ---
 title: "Project 1"
-authors: 'Team 0201 #5, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu
-  Delmar Randolph'
+authors: 'Team 0201 #5, Yiling Du, Alec Mattu, Delmar Randolph, Bryce Hawkins, Onyekachi Igwenagu'
 date: "03/02/2021"
 output: html_document
 ---
@@ -9,13 +8,38 @@ output: html_document
 
 **To:** Dr. Random
 
-**From:** Yiling Du, Alec Mattu, Bryce Hawkins, Onyekachi Igwenagu
+**From:** Yiling Du, Alec Mattu, Delmar Randolph, Bryce Hawkins, Onyekachi Igwenagu
 
 **Subject:** Analysis of 110 automotive vehicle models from 2015
 
 
 ## Background
-The intent of the analysis herein is to provide deep insights into the 110 observations compiled and provided to us by www.lock5stat.com. This compilation of 110 vehicles was provided to lock5stat by KBB.com in 2015, when these vehicles were first available for sale (new). For each of these observations (vehicles) a set of 20 variables is provided. The 110 observations consist of various vehicle models available for sale in 2015. However, this sample only includes a very small proportion of all of the vehicles available for sale in the United States in 2015, and is not representative of the entire set of vehicles on the road today. Aside from providing evaluations of various aspects about this dataset, the goal is to locate trends common between different variables for these vehicles sold in 2015. 
+The purpose of this analysis is to provide insights into 110 vehicle models available in 2015 from various manufacturers. Aside from providing evaluations of various aspects about this dataset, the goal is to locate trends common between different variables. Our dataset is sourced from www.lock5stat.com/datapage.html and includes a small proportion of all available makes and models from 2015. Although it was compiled by lock5stat.com, the original data was provided by KBB.com in 2015. Of the 110 models listed, 20 variables on each observation are available for interpretation.
+
+#### Table of Variables
+|  Variable |                        Name                       |            Example           |
+|:---------:|:-------------------------------------------------:|:----------------------------:|
+|    Make   | Vehicle manufacturer                              | Toyota                       |
+|   Model   | Vehicle model                                     | Prius                        |
+|    Type   | Vehicle category                                  | Small, Hatchback, Sedan, Etc |
+|  LowPrice | Lowest MSRP Available (In 1000s)                  | 6.5                          |
+| HighPrice | Highest MSRP Available (In 1000s)                 | 9.5                          |
+| Drive     | Vehicle output driveaxle                          | FWD                          |
+| CityMPG   | City miles per gallon avg                         | 36                           |
+| HwyMPG    | Highway miles per gallon avg                      | 44                           |
+| FuelCap   | Gas tank capacity in gallons                      | 12.5                         |
+| Length    | Bumper-to-bumper vehicle length (Inch)            | 178.5                        |
+| Width     | Door-to-door vehicle width (Inch)                 | 69.2                         |
+| Height    | Vehicle height from ground-to-roof (Inch)         | 58.1                         |
+| Wheelbase | Vehicle wheelbase (Inch)                          | 106.5                        |
+| UTurn     | Vehicle 180deg U-turn radius (Feet)               | 16                           |
+| Weight    | Vehicle dry weight (Lbs)                          | 2200                         |
+| Acc030    | Vehicle accel. to 30mph (Seconds)                 | 62                           |
+| Acc060    | Vehicle accel. to 60mph (Seconds)                 | 190                          |
+| QtrMile   | Vehicle time in seconds to 1/4th mile             | 92                           |
+| PageNum   | Reference page number in the ConsumerReports mag. | 13                           |
+| Size      | Vehicle size (Small, Midsized, Large)             | Large                        |
+
 
 ## Data Analyses
 
@@ -24,7 +48,7 @@ The intent of the analysis herein is to provide deep insights into the 110 obser
 
 sign "Cars2015" to cars, and show cars
 ```{r}
-cars <- read.csv("~/Downloads/Cars2015.csv", header=T)
+cars <- read.csv(file.choose(), header=T)
 cars
 ```
 analyze the Quantitative Variable "CityMPG" (City miles per gallon), get the five number summary, mean, standard deviation, and variance.
@@ -57,13 +81,13 @@ IQR is good to describe the spread of the database. IQR=Q3-Q1=7, it means the ra
 
 Lets begin the interpretation by loading the Cars2015.csv file into an accessible variable names cars. After we read the dataset into our environment, we just verify that the data did successfully load by typing `cars` into the console.
 ```{r}
-cars <- read.csv("~/Downloads/Cars2015.csv", header=T)
+cars <- read.csv(file.choose(), header=T)
 cars
 ```
 
 For this analysis of a single categorical variable, I've chosen to breakdown the vehicle type category. Although I could have picked another categorical variable, such as Size (Sm/Md/Lg) or Drive (FWD/RWD/AWD), I figured it would be neat to take a look at a variable with so many options (Small, Hatchback, Sedan, etc).
 
-Lets begin the core portion of the analysis by listing the frequency of the categories in the dataset.
+Lets begin the core analysis by listing the frequency of the categories in the dataset.
 ```{r}
 table(cars$Type)
 ```
@@ -81,33 +105,14 @@ Then we will call the `count()` function, provided by Plyr.
 freq_table <- count(cars$Type)
 freq_table
 ```
-Now that this data is easily split up, we can apply it to the `c()` function and build a pie chart. We'll start building the pie chart by assigning a group of colors to the `label_colors` variable. This will be used for our table and graph slices.
+Now that this data is easily split up, we can apply it to the `c()` function and build a pie chart.
 ```{r}
 label_colors <- c("wheat1", "violetred4", "yellow2", "grey50", "azure1", "red")
-```
-
-Then we'll grab the frequency table data (See above) and apply the categorical values (Sedan, SUV, etc) to the variable `labels`. This will be used for our legend. After we do that, we'll grab the pie chart slice labels (The percentages per chunk) and assign that to the variable `percentageLabels`. 
-```{r}
 labels <- c(freq_table$x)
-percentageLabels <- paste(round(freq_table$freq / 110, 1) * 100,
-                          "%",
-                          sep = "")
-```
-
-Just like we did for the labels, we will define the values for the slices. The only exception is that these slices are a numerical value, unlike the labels.
-```{r}
+percentageLabels <- paste(round(freq_table$freq / 110, 1) * 100, "%", sep = "")
 slices <- c(freq_table$freq)
-```
-
-The last two bits of code we will use to build the pie chart and legend.
-```{r}
-pie(slices,
-    labels = percentageLabels,
-    main = "Vehicle Type Pie Chart",
-    col = label_colors)
-legend("topright",
-       freq_table$x,
-       fill = label_colors)
+pie(slices, labels = percentageLabels, main = "Vehicle Type Pie Chart", col = label_colors)
+legend("topright", freq_table$x, fill = label_colors)
 ```
 
 From this visualization above, we can easily see that the sedan class dominates the rest of the types. However, this IS a statistics class, so let's get hardcore numbers.
@@ -172,7 +177,7 @@ type_df
 ```
 The table above is no different than the frequency table, with the exception that it's now usable by the bar plot function with
 
-Let's generate the bar plot to display the frequency of vehicles in a particular vehicle type category. This process is simple to facilitate because of the existing variables we just defined above.
+Let's generate the histogram to display the frequency of vehicles in a particular vehicle type category.
 ```{r}
 barplot(type_df$y, names.arg = type_df$x)
 ```
@@ -180,44 +185,131 @@ barplot(type_df$y, names.arg = type_df$x)
 Of course this graph is no different in utility from the pie chart, but it allows us to see the absolute values of the vehicle types represented in a visual manner. From this, again we can see that the sedan type outnumbers all of the other types, and SUV comes in second place by a very large margin. Based on information gathered from this dataset, it's a safe assumption that passenger vehicles (sedans) make up a large proportion of vehicles on the road in The United States of America.
 
 ### Analysis 3: Two Categorical Variables
-#### Analyst:[Name of Team Member]
+#### Analyst:Bryce Hawkins
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
+# 1) Import the "Cars2015.csv" dataset, and assign it to the data "cars".
+cars <- read_csv()
 
-```{r}
+# Get a summary of cars:
+summary(cars)
 
-```
+# 2) Since we are observing two categorical variables, I chose "Make" and "Type" from the dataset. Let's create frequency tables to observe each variable:
+table(cars$Make)
 
+table(cars$Type)
 
+# Observation: From table(cars$Make), we see the frequency of each make of car--31 in total-- ranging from Acura to Volvo. In table(cars$Type), we see the frequency of 6 different types of cars.
 
+# 3) Now let's check the class of these variables to make sure that they are categorical. Each variable returns as "character", so we are moving in the right direction.
+class(cars$Make)
+
+class(cars$Type)
+
+# 4) Because these variables are classified as characters, they will return as "NULL" when trying to observe the levels. To solve this, we will convert the variables from characters to factors:
+cars$Make_updated <- as.factor(cars$Make)
+# Recall new class:
+class(cars$Make_updated)
+
+cars$Type_updated <- as.factor(cars$Type)
+# Recall new class:
+class(cars$Type_updated)
+
+# 5) Now that we have factors, we can observe and assign levels. Let's assign the car makes to "cars$Make_updated" and car types to "cars$Type_updated":
+levels(cars$Make_updated) <- c("Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Fiat", "Ford", "GMC", "Honda", "Hyundai", "Infiniti", "Jaguar", "Jeep", "Kia", "Land Rover", "Lexus", "Lincoln", "Maserati", "Mazda", "Mercedes", "Mitsubishi", "Nissan", "Porche", "Scion", "Subaru", "Toyoto", "Volkswagen", "Volvo")
+
+# Recall level:
+levels(cars$Make_updated)
+
+levels(cars$Type_updated) <- c("7Pass", "Hatchback", "Sedan", "Sporty", "SUV", "Wagon")
+
+# Recall level:
+levels(cars$Type_updated)
+
+# 6) Now, let's create a two-way table to observe both categorical variables. Assign a table of the new variables to "updated":
+updated <- table(cars$Type_updated, cars$Make_updated)
+
+# Recall the new table, "updated":
+updated
+
+# 7) Finally, we want to observe the relationship between both categorical variables. The best way to do this for the dataset is to create a stacked bar chart. Let's go ahead and fill in the blanks and run the stacked bar chart!
+updated_barplot <-barplot(updated, main ="Make of Car & Type of Car", xlab="Make of Car", ylab="Frequency", col= c("red", "orange", "yellow", "green", "blue", "purple"), legend.text= rownames(updated), beside = FALSE)
+
+# Reassign the stacked bar chart to "updated_barplot" and recall it:
+updated_barplot
+
+# Analysis 3 Discussion:
+# 1) We would hypothesize a potential association from the data above because there is a causal relationship between Car Make and Car Type (Car Type is dependent on Car Make).
+
+# 2) To analyze the variables Make and Type, I had to transform each class from character to factor; Reason being is that observing the level of a character class returns as NULL.
+
+# 3) Given the definition of the levels of these variables (Make of cars and Type of car), there does appear to be an association between the two variables; My summaries led to this potential conclusion as the two-way table and stacked bar chart seemlessly fit both of the variables (cars$Make_updated and cars$Type_updated) together.
+
+# 4) The association here appears to be a Categorical-Categorical relationship.
 
 ### Analysis 4: One Categorical and One Quantitative Variable
-#### Analyst:[Name of Team Member]
+#### Analyst: Delmar Randolph 
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+Lets begin by loading the Cars2015.csv file into an accessible variable name (d). After we read the dataset into our environment, verify that the data did successfully load by typing `d` into the console.
 
 ```{r}
+cars <- file.choose()
+d <- read.csv(cars)
+d
 
 ```
 
+Now that we have read the file in question to work with successfully, let's find a categorical variable, as well as a quantitative variable to work with, and create a side-by-side plot. I personally chose to analyze the Quantitative Variable "CityMPG" (City miles per gallon) and the categorical variable "Size" - referencing the size of the vehicle ranging from "small, mid-sized, large"
 
+```{r}
+summary(d$CityMPG)
+```
 
+draw histogram and box plot for CityMPG
+
+```{r}
+hist(d$CityMPG, breaks=5, 
+     main = "Distribution of CityMPG",
+     xlab= "CityMPG(City miles per gallon)",
+     ylab= "Number of cars")
+boxplot(d$CityMPG,
+        main = "Distribution of CityMPG",
+        ylab= "CityMPG(City miles per gallon)")
+```
+I decided to compare this quantitative variable to the vehicle type category. I feel as though the vehicle type plays an integral role in it's CityMPG.
+
+```{R}
+table(d$Size)
+```
+
+Given the output, I believe it would be best to work with the Size of the vehicle from the data. With these three sizes, I will compare the CityMPG of all three and draw conclusions based on the graphs of given the data.
+
+```{R}
+boxplot(d$CityMPG~d$Size)
+boxplot(d$CityMPG~d$Size, xlab="Size", ylab="CityMPG",main="City MPG by Size of Car")
+```
+Based on the side-by-side box plot above, we can see that the smaller the size of the vehicle, the more mileage per gallon in the city it gets. 
 
 ### Analysis 5: Two Quantitative Variable
-#### Analyst:[Name of Team Member]
+#### Analyst: James Igwenagu
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
+To start off the process I imported the Cars2015.csv file into a variable called cars. The data set appeared,  I used the code below to lead the dataset. 
+
 
 ```{r}
-
+cars <- read.csv(file.choose(), header=T)
+cars
 ```
 
+For a pair of quantitative variables, create a scatter plot.
 
+```{r}
+plot(cars$HwyMPG, cars$FuelCap)
+```
 
-
+The variable HwyMPG is the explanatory variable because the HwyMPG predicts change in the response variable which is FuelCap. FuelCap measures the outcome which is the gas tank capacity in gallons depending on the vehicles make and model.  Looking at the scatter plot i can determine that the lower the FuelCap the Higher the HwyMPG. Also the higher the FuelCap the lower the HwyMPG is, there is a small number is high FuelCap vehicles. The scatterplot shows a negative potential linear relationship.  
 
 ## Recommendations
-
-[Add text section with your recommendations here. In this section, you will briefly summarize the most interesting features of your data. Are you seeing any trends, associations, or interesting features? Highlight these and make a recommendation that they be subjected to further statistical analysis. If there isn’t anything interesting, say so!]
+Although we believe that in performing the analysis, we unlocked insights and actual representative data, we don't believe that any unexpected or unknown information became uncovered through exploring this dataset. For example, we can take a look at the data provided by Analysis #1 and #4; The graphics and summaries show no shocking or unknown information, the smaller the vehicle (By class), the more fuel efficient the vehicle tends to be. Not straying from this opinion, if we take a look at Analysis #2, we can see that the most common type of vehicle, without any hesitation, is a Sedan. The remaining 5 classes make up roughly an equally spread distribution of vehicles on the road. In summary, analyzing this dataset of 2015 Model Years didn't unlock any additional information we could have not otherwise gathered through our own individual experiences on highways or roads in our respective environments.
 
 
