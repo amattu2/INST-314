@@ -10,6 +10,14 @@ Teachers:
 |:-|:-|:-|
 |lab1|-|Code correct, some documentation issues|
 |lab2|87%|Code correct, data visualization complaints|
+|lab3|||
+
+# Project Grades
+
+|Lab|Grade|Notes|
+|:-|:-|:-|
+|Unit 1|-||
+|Unit 2|-||
 
 # Notes
 N/A
