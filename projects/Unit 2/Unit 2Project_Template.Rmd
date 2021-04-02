@@ -1,0 +1,274 @@
+---
+title: 'Project #2'
+authors: '201Team1, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar Randolph'
+date: '04/06/2021'
+output: html_notebook
+
+---
+**Title:** Briefing Memorandum
+
+**To:** Dr. Random
+
+**From:** 201Team1, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar Randolph
+
+**Subject:** Analysis of 110 automotive vehicle models from 2015
+
+
+## Background
+Our 2015 Vehicle Model Year Dataset is derived from data provided and compiled by KBB.com in 2015. Within this detailed analysis of our dataset, we want to derive inferences on various levels of means and proportions. Our population of interest revolves around vehicle models available in the United States during the 2015 new model release cycle (2015 model year). A snapshot of our dataset features and attributes is included below, with example values:
+
+### Table Code
+```{md}
+|  Variable | Name|Example|Type (Quant. / Cat.)|
+|:---------|:------------------------------------------|:----------------------------:|:-|
+|    Make   | Vehicle manufacturer                              | Toyota                       |Categorical|
+|   Model   | Vehicle model                                     | Prius                        |Categorical|
+|    Type   | Vehicle category                                  | Hatchback |Categorical|
+|  LowPrice | Lowest MSRP Available (In 1000s)                  | 6.5                          |Quant.|
+| HighPrice | Highest MSRP Available (In 1000s)                 | 9.5                          |Quant.|
+| Drive     | Vehicle output driveaxle                          | FWD                          |Categorical|
+| CityMPG   | City miles per gallon avg                         | 36                           |Quant.|
+| HwyMPG    | Highway miles per gallon avg                      | 44                           |Quant.|
+| FuelCap   | Gas tank capacity in gallons                      | 12.5                         |Quant.|
+| Length    | Bumper-to-bumper vehicle length (Inch)            | 178.5                        |Quant.|
+| Width     | Door-to-door vehicle width (Inch)                 | 69.2                         |Quant.|
+| Height    | Vehicle height from ground-to-roof (Inch)         | 58.1                         |Quant.|
+| Wheelbase | Vehicle wheelbase (Inch)                          | 106.5                        |Quant.|
+| UTurn     | Vehicle 180deg U-turn radius (Feet)               | 16                           |Quant.|
+| Weight    | Vehicle dry weight (Lbs)                          | 2200                         |Quant.|
+| Acc030    | Vehicle accel. to 30mph (Seconds)                 | 62                           |Quant.|
+| Acc060    | Vehicle accel. to 60mph (Seconds)                 | 190                          |Quant.|
+| QtrMile   | Vehicle time in seconds to 1/4th mile             | 92                           |Quant.|
+| Size      | Vehicle size (Small, Midsized, Large)             | Large                        |Categorical|
+```
+
+### Table of Variables
+|  Variable |Name|Example|Type (Quant. / Cat.)|
+|:---------|:----------------------------|:---------------:|:-|
+|    Make   | Vehicle manufacturer                              | Toyota                       |Categorical|
+|   Model   | Vehicle model                                     | Prius                        |Categorical|
+|    Type   | Vehicle category                                  | Hatchback |Categorical|
+|  LowPrice | Lowest MSRP Available (In 1000s)                  | 6.5                          |Quant.|
+| HighPrice | Highest MSRP Available (In 1000s)                 | 9.5                          |Quant.|
+| Drive     | Vehicle output driveaxle                          | FWD                          |Categorical|
+| CityMPG   | City miles per gallon avg                         | 36                           |Quant.|
+| HwyMPG    | Highway miles per gallon avg                      | 44                           |Quant.|
+| FuelCap   | Gas tank capacity in gallons                      | 12.5                         |Quant.|
+| Length    | Bumper-to-bumper vehicle length (Inch)            | 178.5                        |Quant.|
+| Width     | Door-to-door vehicle width (Inch)                 | 69.2                         |Quant.|
+| Height    | Vehicle height from ground-to-roof (Inch)         | 58.1                         |Quant.|
+| Wheelbase | Vehicle wheelbase (Inch)                          | 106.5                        |Quant.|
+| UTurn     | Vehicle 180deg U-turn radius (Feet)               | 16                           |Quant.|
+| Weight    | Vehicle dry weight (Lbs)                          | 2200                         |Quant.|
+| Acc030    | Vehicle accel. to 30mph (Seconds)                 | 62                           |Quant.|
+| Acc060    | Vehicle accel. to 60mph (Seconds)                 | 190                          |Quant.|
+| QtrMile   | Vehicle time in seconds to 1/4th mile             | 92                           |Quant.|
+| Size      | Vehicle size (Small, Midsized, Large)             | Large                        |Categorical|
+
+
+## Inference Analyses
+
+### Analysis 1: One Mean -[Highway miles per gallon]
+#### Analyst:[Yiling Du]
+
+sign "Cars2015" to cars, and show cars
+```{r}
+cars <- read.csv(file.choose(), header=T)
+cars
+```
+extract the variable (Highway miles per gallon)that we need, keep only values that are not NA, save it as a new object (HwyMPG2): 
+```{r}
+HwyMPG2<- cars$HwyMPG[!is.na(cars$HwyMPG)]
+HwyMPG2
+
+```
+First, I want to check for outliers and potentially eliminate. I will analyze the quantitative variable "HwyMPG2", and draw histogram and box plot for HwyMPG2, to see are there outliers?
+
+Analyze the Quantitative Variable "HwyMPG2", get the five number summary, mean, standard deviation, and variance:
+```{r}
+summary(HwyMPG2)
+sd(HwyMPG2)
+var(HwyMPG2)
+```
+Draw histogram and box plot for HwyMPG2:
+```{r}
+hist(HwyMPG2, breaks=5, 
+     main = "Distribution of HwyMPG2",
+     xlab= "HwyMPG2(Highway miles per gallon)",
+     ylab= "Number of cars")
+boxplot(HwyMPG2,
+        main = "Distribution of HwyMPG2",
+        ylab= "HwyMPG2(Highway miles per gallon)")
+```
+From the five number summary, histogram and box plot, we can see there is no outlier.
+
+Then, we test the normality of the data:
+I use the Visual Method: Create a Histogram of the HwyMPG2 
+```{r}
+library(ggplot2)
+ggplot( ) +
+  geom_histogram(mapping = aes(x = HwyMPG2), binwidth = 5)
+```
+Conditions:
+From the histogram, we can know the data is not sufficiently "normal", despite the skew. However, the sample size is large and sigma is not known. Thus, we can use the t-distribution for confidence interval and hypothesis testing. 
+
+95% Confidence interval for the HwyMPG2:
+I use t.test:
+```{r}
+t.test(HwyMPG2, conf.level = 0.95)
+```
+From the t.test, we can see the 95% confidence interval is (28.31734, 30.40993). 
+That means, we are 95% confident that average highway miles per gallon of cars is between 28.31734 and 30.40993.
+
+Hypothesis Test:
+
+Source:"Among cars (including all sedans, coupes, and convertibles), the overall average combined mpg: 26.4 mpg."
+https://www.carfax.com/blog/what-is-good-gas-mileage#:~:text=Among%20cars%20%28including%20all%20sedans%2C%20coupes%2C%20and%20convertibles%29%2C,help%20to%20keep%20more%20money%20in%20your%20pocket.
+
+From the source, we can set the baseline for HwyMPG2 is 26.4,
+Conduct the hypothesis test on the average highway miles per gallon, with 26.4 mpg as the baseline:
+
+null hypothesis: the average highway miles per gallon is 26.4
+
+alternative hypothesis: the average highway miles per gallon is not equal to 
+
+Because the alternative hypothesis is not equal, so it is a two-tail test.
+
+Using t.test:
+```{r}
+t.test(HwyMPG2, mu = 26.4)
+```
+We get the p-value=1.524*10^(-7), a very small number, and p-value < 0.05, so we reject null. 
+
+There is significance evidence to conclude that the average highway miles per gallon is different from 26.4 at 0.05 level of significance. 
+
+The results of the confidence interval corroborateS the conclusions of the hypothesis test because the confidence interval (28.31734, 30.40993) does not contain the hypothesized value of miu=26.4. If the confidence interval does not contain the hypothesized value of miu, it means reject Ho.
+
+Limitations: the 110 cars(only from 31 makers, there are more than 31 car makers) are not representative enough for all cars.
+
+
+### Analysis 2: One Proportion - Vehicle type/class (Small, Hatchback, Sedan, Etc)
+#### Analyst: Alec K. Mattu
+
+Before we begin the inferential analysis, we need to load the Cars 2015 dataset into a reference variable named cars. 
+```{r}
+cars <- read.csv(file.choose(), header=T)
+cars
+```
+
+Now that we have the dataset loaded into our workspace, we need to first begin by cleaning the data. This can be accomplished using the following simple R code to remove non-existent values:
+```{r}
+Type <- cars$Type[!is.na(cars$Type)]
+```
+
+Now that the categorical variable `Type` in the `cars2015` dataset is cleaned of any potential null or empty values, we need to make sure that the category of interest, which is "Hatchbacks", meet the minimum requirements for CLT. Let's start with a table to summarize the type variable:
+
+```{r}
+table(Type)
+```
+
+In this case, we see that there are 11 Hatchbacks (successes) and plenty of failures. For sake of posterity, lets re-categorize the successes and failures appropriately. This is a simple procedure with R:
+
+```{r}
+success_failure <- c(length(Type[Type == "Hatchback"]), length(Type[Type != "Hatchback"]))
+sf_names <- c("Success (Hatchback)", "Failure (Other)")
+out <- matrix(success_failure)
+dimnames(out) <- list(Type = sf_names, "Count")
+print(out)
+```
+
+From the above table, we can see that there are 11 Hatchbacks and 99 other vehicle categories. Let's visualize the above result in a pie chart.
+
+```{r}
+label_colors <- c("green", "violetred4")
+labels <- c("Success", "Failure")
+slices <- c(11, 99)
+pie(slices, labels = c("Success (10%)", "Failure (90%)"), main = "Vehicle Type Pie Chart", col = label_colors)
+```
+Again, we can visualize the graph using a different method. In this case, let's use a box plot.
+
+```{r}
+barplot(c(11, 99), names.arg = c("Hatchback (11)", "Other (99)"), ylab = "Number of Vehicles", ylim = c(0, 110), xlab = c("Vehicle type distribution"))
+```
+Now that we've prepared, cleaned, and visualized the data, let's dig deeper. We know that the conditions for the CLT are met.
+a) These are independent samples pulled from available vehicle listings in 2015
+b) There are 10 successes and 10 failures in each type (11:99 to be exact)
+
+The sample proportion, standard error, and point estimates of Hatchbacks to other is calculated below:
+```{r}
+p = 11 / 110 # Hatchbacks compared to the entire sample
+print(p)
+z = 1.645 # Calculated z-score for 90% confidence interval
+SE = sqrt((p*(1-p) / 110)) # Standard error 
+point_est_low <- p - z * SE
+point_est_high <- p + z * SE
+print(paste0("Confidence interval (", round(point_est_low, 6), " - ", round(point_est_high, 6), ")"))
+```
+
+Based on the above calculations from our sampled data collected from available vehicle types in 2015, let's create a hypothesis.
+
+Null Hypothesis: Hatchbacks make up anywhere from 5.2% to 14.7% of the available model types for vehicle model year 2015. 
+
+Alternative Hypothesis: The amount of hatchbacks available in the United States do not fall between ~5.3% to 14.7% of all available model types. 
+
+Data source: [Autolist](https://autolist.com). Autolist is a United States based automotive listing aggregate source. They partner with multiple well known corporations (think: CarMax, BMW NA, Etc) to list available inventory. This source is the most representative automotive listing site available, and the best estimator for finding available vehicles by categorical variables.
+
+Analyis: To calculate the proportion of available Hatchbacks in the United States to all the other types, let's find the full number of vehicles listed on our data source. The link to the search result is [here](https://www.autolist.com/listings#page=1&body_style%5B%5D=passenger_cargo_van&body_style%5B%5D=hatchback&body_style%5B%5D=coupe&body_style%5B%5D=wagon&body_style%5B%5D=suv&body_style%5B%5D=sedan&location=undefined%2C+undefined&year_max=2015&year_min=2015&latitude=&longitude=), where we can see that (as of 04/01/2021) there are `70,508` vehicles available matching the 2015 to 2015 filter as well as the original 6 categories of vehicles (Sedan, Wagon, Etc). If we apply the additional hatchback filter, the [search results](https://www.autolist.com/listings#page=1&location=undefined%2C+undefined&year_min=2015&latitude=&longitude=&body_style%5B%5D=hatchback&year_max=2015) in `3,786` vehicles. Let's calculate the percentage:
+
+```{r}
+print(3786 / 70508)
+```
+
+Based on the above ~5.4% figure above, we *fail to reject* our null hypothesis and conclude that hatchbacks do make up between 5.3% and 14.7% of the vehicle types available in the United States in 2015.
+
+When I extended the range from 2015-2015 to 2015-2022 (current model year). What I found with that search result was that the availability of hatchbacks went down a substantial amount between the 2015 model years until now. For all model types with model years ranging from 2015-2022, there were `1,704,261` available [source](https://www.autolist.com/listings#page=1&body_style%5B%5D=passenger_cargo_van&body_style%5B%5D=hatchback&body_style%5B%5D=coupe&body_style%5B%5D=wagon&body_style%5B%5D=suv&body_style%5B%5D=sedan&location=undefined%2C+undefined&year_max=&year_min=2015&latitude=&longitude=). When restricted to 2015-2022 and only hatchbacks, a surprisingly low amount of `62,857` were available [source](https://www.autolist.com/listings#page=1&location=undefined%2C+undefined&year_min=2015&latitude=&longitude=&body_style%5B%5D=hatchback&year_max=). See below for the calculation:
+
+```{r}
+print(62857 / 1704261)
+```
+
+Based on this, we can make an initial proposition that the popularity of hatchbacks in the United States went downward approximately ~2%. 
+
+Conclusions: The results of the initial test for 2015 model years do corroborate the conclusions within the hypothesis test and point estimates. One limitation to this is the "response bias" involved with the source data from Autolist. Because of the nature of the website, seeing as it's for listing vehicles for sale, perhaps a "non-response" bias is present; Maybe more people are prone to keeping their hatchbacks over other vehicle types, and thus, their representation isn't present in the sourced data. 
+
+### Analysis 3: Two Proportions - [Name or description of your Variables]
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+
+
+### Analysis 4:Two Independent Means - [Name or description of your Variable]
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+
+
+### Analysis 5: Paired Data - [Name or description of your Variables]
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+
+
+
+## Recommendations
+
+[Add text section with your recommendations here. In this section, you will briefly  summarize the conclusions of your estimates and tests. What statistically significant findings did you have?  What limitations are there in your findings?  Discuss if/how this is relevant in the context of your data – does it give us new insights ? Help us to better understand some phenomenon?  Or not?]
+
