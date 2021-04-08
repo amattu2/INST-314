@@ -69,14 +69,14 @@ Our 2015 Vehicle Model Year Dataset is derived from data provided and compiled b
 ## Inference Analyses
 
 ### Analysis 1: One Mean -[Highway miles per gallon]
-#### Analyst:[Yiling Du]
+#### Analyst: Yiling Du
 
 sign "Cars2015" to cars, and show cars
 ```{r}
 cars <- read.csv(file.choose(), header=T)
 cars
 ```
-extract the variable (Highway miles per gallon)that we need, keep only values that are not NA, save it as a new object (HwyMPG2): 
+extract the variable (Highway miles per gallon)that we need, keep only values that are not NA, save it as a new object (HwyMPG2):
 ```{r}
 HwyMPG2<- cars$HwyMPG[!is.na(cars$HwyMPG)]
 HwyMPG2
@@ -92,7 +92,7 @@ var(HwyMPG2)
 ```
 Draw histogram and box plot for HwyMPG2:
 ```{r}
-hist(HwyMPG2, breaks=5, 
+hist(HwyMPG2, breaks=5,
      main = "Distribution of HwyMPG2",
      xlab= "HwyMPG2(Highway miles per gallon)",
      ylab= "Number of cars")
@@ -103,21 +103,21 @@ boxplot(HwyMPG2,
 From the five number summary, histogram and box plot, we can see there is no outlier.
 
 Then, we test the normality of the data:
-I use the Visual Method: Create a Histogram of the HwyMPG2 
+I use the Visual Method: Create a Histogram of the HwyMPG2
 ```{r}
 library(ggplot2)
 ggplot( ) +
   geom_histogram(mapping = aes(x = HwyMPG2), binwidth = 5)
 ```
 Conditions:
-From the histogram, we can know the data is not sufficiently "normal", despite the skew. However, the sample size is large and sigma is not known. Thus, we can use the t-distribution for confidence interval and hypothesis testing. 
+From the histogram, we can know the data is not sufficiently "normal", despite the skew. However, the sample size is large and sigma is not known. Thus, we can use the t-distribution for confidence interval and hypothesis testing.
 
 95% Confidence interval for the HwyMPG2:
 I use t.test:
 ```{r}
 t.test(HwyMPG2, conf.level = 0.95)
 ```
-From the t.test, we can see the 95% confidence interval is (28.31734, 30.40993). 
+From the t.test, we can see the 95% confidence interval is (28.31734, 30.40993).
 That means, we are 95% confident that average highway miles per gallon of cars is between 28.31734 and 30.40993.
 
 Hypothesis Test:
@@ -130,7 +130,7 @@ Conduct the hypothesis test on the average highway miles per gallon, with 26.4 m
 
 null hypothesis: the average highway miles per gallon is 26.4
 
-alternative hypothesis: the average highway miles per gallon is not equal to 
+alternative hypothesis: the average highway miles per gallon is not equal to 26.4
 
 Because the alternative hypothesis is not equal, so it is a two-tail test.
 
@@ -138,9 +138,9 @@ Using t.test:
 ```{r}
 t.test(HwyMPG2, mu = 26.4)
 ```
-We get the p-value=1.524*10^(-7), a very small number, and p-value < 0.05, so we reject null. 
+We get the p-value=1.524*10^(-7), a very small number, and p-value < 0.05, so we reject null.
 
-There is significance evidence to conclude that the average highway miles per gallon is different from 26.4 at 0.05 level of significance. 
+There is significance evidence to conclude that the average highway miles per gallon is different from 26.4 at 0.05 level of significance.
 
 The results of the confidence interval corroborateS the conclusions of the hypothesis test because the confidence interval (28.31734, 30.40993) does not contain the hypothesized value of miu=26.4. If the confidence interval does not contain the hypothesized value of miu, it means reject Ho.
 
@@ -150,7 +150,7 @@ Limitations: the 110 cars(only from 31 makers, there are more than 31 car makers
 ### Analysis 2: One Proportion - Vehicle type/class (Small, Hatchback, Sedan, Etc)
 #### Analyst: Alec K. Mattu
 
-Before we begin the inferential analysis, we need to load the Cars 2015 dataset into a reference variable named cars. 
+Before we begin the inferential analysis, we need to load the Cars 2015 dataset into a reference variable named cars.
 ```{r}
 cars <- read.csv(file.choose(), header=T)
 cars
@@ -199,7 +199,7 @@ The sample proportion, standard error, and point estimates of Hatchbacks to othe
 p = 11 / 110 # Hatchbacks compared to the entire sample
 print(p)
 z = 1.645 # Calculated z-score for 90% confidence interval
-SE = sqrt((p*(1-p) / 110)) # Standard error 
+SE = sqrt((p*(1-p) / 110)) # Standard error
 point_est_low <- p - z * SE
 point_est_high <- p + z * SE
 print(paste0("Confidence interval (", round(point_est_low, 6), " - ", round(point_est_high, 6), ")"))
@@ -207,9 +207,9 @@ print(paste0("Confidence interval (", round(point_est_low, 6), " - ", round(poin
 
 Based on the above calculations from our sampled data collected from available vehicle types in 2015, let's create a hypothesis.
 
-Null Hypothesis: Hatchbacks make up anywhere from 5.2% to 14.7% of the available model types for vehicle model year 2015. 
+Null Hypothesis: Hatchbacks make up anywhere from 5.2% to 14.7% of the available model types for vehicle model year 2015.
 
-Alternative Hypothesis: The amount of hatchbacks available in the United States do not fall between ~5.3% to 14.7% of all available model types. 
+Alternative Hypothesis: The amount of hatchbacks available in the United States do not fall between ~5.3% to 14.7% of all available model types.
 
 Data source: [Autolist](https://autolist.com). Autolist is a United States based automotive listing aggregate source. They partner with multiple well known corporations (think: CarMax, BMW NA, Etc) to list available inventory. This source is the most representative automotive listing site available, and the best estimator for finding available vehicles by categorical variables.
 
@@ -227,24 +227,96 @@ When I extended the range from 2015-2015 to 2015-2022 (current model year). What
 print(62857 / 1704261)
 ```
 
-Based on this, we can make an initial proposition that the popularity of hatchbacks in the United States went downward approximately ~2%. 
+Based on this, we can make an initial proposition that the popularity of hatchbacks in the United States went downward approximately ~2%.
 
-Conclusions: The results of the initial test for 2015 model years do corroborate the conclusions within the hypothesis test and point estimates. One limitation to this is the "response bias" involved with the source data from Autolist. Because of the nature of the website, seeing as it's for listing vehicles for sale, perhaps a "non-response" bias is present; Maybe more people are prone to keeping their hatchbacks over other vehicle types, and thus, their representation isn't present in the sourced data. 
+Conclusions: The results of the initial test for 2015 model years do corroborate the conclusions within the hypothesis test and point estimates. One limitation to this is the "response bias" involved with the source data from Autolist. Because of the nature of the website, seeing as it's for listing vehicles for sale, perhaps a "non-response" bias is present; Maybe more people are prone to keeping their hatchbacks over other vehicle types, and thus, their representation isn't present in the sourced data.
 
-### Analysis 3: Two Proportions - [Name or description of your Variables]
-#### Analyst:[Name of Team Member]
+### Analysis 3: Two Proportions - [Weight, HwyMPG]
+#### Analyst:[Delmar Randolph]
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
+[To begin the inferential analysis, we need to load the Cars 2015 data set into a reference variable named cars.]
 
 ```{r}
 
+cars <- read.csv(file.choose(), header=T)
+cars
+
 ```
 
+[Now that the data set has been loaded into our work space, we need to clean the data by running the following code to remove non-existent values]
+
+```{r}
+
+HwyMPG <- cars$HwyMPG[!is.na(cars$HwyMPG)]
+Weight <- cars$Weight[!is.na(cars$Weight)]
+HwyMPG
+Weight
+
+```
+[Now that the categorical variables 'Weight' and 'HwyMPG' in the data set are cleaned of null and/or empty values, and we can clearly see the criteria is met (independent, and at least 10 successes/failures for each category), let's visualize these two variables to examine the relationship between weight and HwyMPG in the date set:]
+
+```{r}
+
+library(ggplot2)
+ggplot(data = cars, aes(x = Weight, y = HwyMPG)) +
+  geom_point() +
+  geom_smooth(method='lm') +
+  xlab('HwyMPG') +
+  ylab('Weight') +
+  ggtitle('HwyMPG vs. Weight')
 
 
+```
+[The data clearly shows that weight and HwyMPG are inversely related: as weight increases, MPG decreases. The R-squared of the linear best fit line, as shown below, is over 70%. This means that variations in a car’s weight explain over 70% of the changes to its MPG.]
+
+```{r}
+
+fitLine = lm(HwyMPG ~ Weight, data=cars)
+summary(fitLine)
+
+```
+
+[# T-Test w/ 99% confidence interval
+ # two-sided test
+ # assume non-equal variances]
+
+```{r}
+
+t.test(Weight, HwyMPG, conf.level = .99, alternative = "two.sided", var.equal = FALSE)
+
+```
+
+[From the t.test, we can see the 99% confidence interval is (3599.786, 4033.487).
+This means we are 99% confident that average highway miles per gallon of cars proportional to it's weight are between 3599.786 and 4033.487.The mean weight is 3846.00, and the mean HwyMPG is 29.3636.
+
+Hypothesis Test:
+
+Source:"Among cars (including all sedans, coupes, and convertibles), the overall average combined mpg: 26.4 mpg."
+https://www.carfax.com/blog/what-is-good-gas-mileage#:~:text=Among%20cars%20%28including%20all%20sedans%2C%20coupes%2C%20and%20convertibles%29%2C,help%20to%20keep%20more%20money%20in%20your%20pocket.
+
+Source:"The average car weighs just 2,871 pounds (Source: https://www.creditdonkey.com/average-weight-car.html)"
+https://www.creditdonkey.com/average-weight-car.html#:~:text=The%20average%20car%20weighs%20just%202%2C871%20pounds.
+
+From the sources, we can set the baseline for HwyMPG is 26.4, and the baseline weight is 2871 lbs.
+
+Conduct the hypothesis test on the average highway miles per gallon, proportional to it's weight using 26.4 mpg, and 2871 lbs. as the baseline (see above t-test):
+
+null hypothesis: the average highway miles per gallon, proportional to it's weight is equal to 26.4 & 2871 lbs.
+
+alternative hypothesis: the average highway miles per gallon is not equal to 26.4 & 2871 lbs.
+
+Because the alternative hypothesis is not equal, so it is a two-tail test.]
+
+Conclusion: We reject the null hypothesis.
+
+There is significant evidence to conclude that the average highway miles per gallon is different from 26.4 and 2871 lbs. at 0.05 level of significance.
+
+The results of the confidence interval corroborateS with the conclusions of the hypothesis test, as the confidence interval does not contain the hypothesized value of miu = 26.4 & 2871 lbs. If the confidence interval does not contain the hypothesized value of the alternative hypothesis, then we reject the null hypothesis.
+
+Limitations: The amount of cars in the data set are not representative enough for all cars, as it does not represent the entirety of car manufacturers, or other data that correlates with every single car manufacturer.
 
 ### Analysis 4:Two Independent Means - [Name or description of your Variable]
-#### Analyst:[Name of Team Member]
+#### Analyst: Bryce Hawkins
 
 [Put text of analysis here and add as many code chunks and text sections as you need.]
 
@@ -252,23 +324,86 @@ Conclusions: The results of the initial test for 2015 model years do corroborate
 
 ```
 
+### Analysis 5: Paired Data - [Highway Miles per Gallon, Fuel Capacity]
+#### Analyst: James Igwenagu
 
+First we load the Cars 2015 dataset into a variable named cars
 
+```{r}
+cars <- read.csv(file.choose(), header=T)
+cars
+```
 
-### Analysis 5: Paired Data - [Name or description of your Variables]
-#### Analyst:[Name of Team Member]
+Next I would create a histogram to visualize the difference between the two variables
+```{r}
+hist(cars$HwyMPG)
+hist(cars$FuelCap)
+```
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
-
+I created a new variable for the difference.
 ```{r}
 
 ```
 
+After looking at the data value for the difference I can now create a histogram the shows the Before and after.
+```{r}
+hist(diff, main="Sample Difference", xlab="Before-After")
+```
+
+Next i will run the 95% confidence interval for the mean difference.
+
+Condition: Looking at the histogram we can see that the mean are normally distributed. We can now use t-distribution for the confidence interval and hypothesis testing.
+
+```{r}
+t.test(cars$HwyMPG, cars$FuelCap, paired = TRUE, conf.level = 0.95)
+```
+
+Hypothesis: Source:”The amount of gas a car holds depends on the size of the car. Smaller cars generally have gas tanks that hold 12 gallons worth of gas, while larger cars can hold 15 or 16 gallons.” Fuel Capacity for a vehicle is 14 - 16 gallons with an average of 14 gallons per mile. An average of Highway MPG is “decreased by 0.2 miles per gallon to 24.9 mpg”
+
+Null Hypothesis: The average highway miles per gallon is 24.9
+
+alternative hypothesis:  The average highway miles per gallon is not equal to 26.4 it is equal to 0.
+
+Since the alternative hypothesis is not equal, it is a two-tail test.
 
 
+A hypothesis test for the difference in the means at a significance level consistent with the
+confidence interval.
+```{r}
+t.test(cars$HwyMPG-cars$FuelCap, mu=0, alt="two-sided", conf.level = 0.95, var.equal = FALSE, paired = FALSE)
+```
 
+We get the p-value=2.2*10^16 a small number, and p-value < 0.05, so we reject null.
+
+I do not see a significance evidence to conclude that the average highway miles per gallon is different from 24.9 at 0.05 level of significance.
+
+Conclusion: After completing the test of the difference between the mean of the variables and also the initial hypothesis, there seems to be no significant difference.  The result of the  confidence interval was ( 9.603151,  13.115031) does not include the hypothesized value of mu=24.9. Ho was rejected.
+
+Limitations: A limitation that i experienced was that there are a variety of car models and each with a consistent Fuel cap and HwyMPG rating.
 
 ## Recommendations
+*Delmar Randolph's A3
+Two Sample t-test
 
-[Add text section with your recommendations here. In this section, you will briefly  summarize the conclusions of your estimates and tests. What statistically significant findings did you have?  What limitations are there in your findings?  Discuss if/how this is relevant in the context of your data – does it give us new insights ? Help us to better understand some phenomenon?  Or not?]
+data:  Weight and HwyMPG
+t = 46.142, df = 109.01, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+99 percent confidence interval:
+ 3599.786 4033.487
+sample estimates:
+ mean of x  mean of y
+3846.00000   29.36364
 
+Ho: The average of highway miles per gallon, proportional to it's weight is equal to 26.4 & 2871 lbs.
+
+Alternative hypothesis: The average of highway miles per gallon is not equal to 26.4 & 2871 lbs.
+
+Conclusion: We reject the null hypothesis.
+
+There is significant evidence to conclude that the average highway miles per gallon is different from the baseline 26.4 and 2871 lbs. at 0.05 level of significance.
+
+The results of the confidence interval corroborateS with the conclusions of the hypothesis test, as the confidence interval does not contain the hypothesized average value of 26.4 & 2871 lbs. If the confidence interval does not contain the hypothesized value of the alternative hypothesis, then we reject the null hypothesis.
+
+Limitations: The amount of cars in the data set are not representative enough for all cars, as it does not represent the entirety of car manufacturers, or other data that correlates with every single car manufacturer.
+
+Overall, we were hoping there was a significance between HwyMPG and the weight of the vehicle - in which there is: the more weight to the vehicle, the less mileage on the highway it outputs. However, we don't believe that any unexpected or unknown information became uncovered through exploring this data set for this particular analysis.
