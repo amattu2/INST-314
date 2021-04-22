@@ -1,0 +1,217 @@
+---
+title: "INST 314 - Week 13 Lab - Spring 2021"
+name: Alec Mattu
+date: "04-22-21"
+output:
+  html_document:
+    df_print: paged
+---
+## A. Chi-Square Analysis
+### 1
+*Using R, load the data, check the variables, and find those that you will need to create a contingency table for showing top choice of water versus their usual water source.  Label your rows and columns.*
+
+Read the WaterTaste CSV file into a variable `water`.
+```{r}
+water <- read.csv("./WaterTaste.csv")
+```
+
+Display the labels/columns present in the dataset
+```{r}
+ls(water)
+```
+
+Display a contingency table for the data in the dataset using `table` and data factoring. Here we see the analysis of top vs usual source choices.
+```{r}
+freq_table <- table(as.factor(water$First), as.factor(water$UsuallyDrink))
+freq_table
+```
+
+### 2
+*State valid null and alternative hypotheses for the chi-square test of independence.*
+
+a.    Null Hypothesis H<sub>0</sub>: The first water choice and usual water choices for each individual are independent of one-another.
+
+b.    Alt. Hypothesis H<sub>A</sub>: The opposite of H<sub>0</sub> is the case, where the distribution of the first water choice and the usual water choices ARE dependent upon eachother.
+
+### 3
+*Using R, conduct a chi-square test of independence with this data.*
+```{r}
+chisq.test(freq_table)
+```
+
+### 5
+*Based on your analysis, is there evidence that the top choices for taste preference are associated with whether or not people usually drink bottled water? If there is a significant association between these two variables, describe how they are related.*
+
+As demonstrated in the above code segment, we have a p-value of `~0.55`, which is objectively above the standard significance level of `0.05`. With this being said, we reject the null hypothesis (H<sub>0</sub>) and make the claim that there is support that there exists a relationship (dependence) between the first choice of water and the usual pick.
+
+
+## B. Analysis of Variance (ANOVA)
+*Load the data, check the variables, and find those that you will need for this assignment. Optional:  Subset the dataset to only retain the variables that you need for this analysis.*
+
+```{r}
+cereal <- read.csv("./Cereal.csv")
+```
+
+Display the labels/columns present in the dataset
+```{r}
+ls(cereal)
+```
+
+### 1
+*Summarize your data.*
+
+a. Create a table of summary statistics, showing the sample size, mean, and standard deviation for each company.  
+
+```{r}
+attach(cereal)
+```
+
+```{r}
+dim(cereal)
+```
+
+```{r}
+names(cereal)
+```
+
+```{r}
+str(cereal)
+```
+
+```{r}
+head(cereal)
+```
+```{r}
+summary(cereal)
+```
+
+Standard Deviation for Company K
+```{r}
+company_K <- filter(Company == "K", TRUE)
+sd(company_K)
+```
+
+Standard Deviation for Company G
+```{r}
+company_G <- filter(cereal$Company == "G", TRUE)
+sd(company_G)
+```
+
+Standard Deviation for Company Q
+```{r}
+company_Q <- filter(cereal$Company == "Q", TRUE)
+sd(company_Q)
+```
+
+Or... Using `tapply` from the lectures to find mean:
+```{r}
+tapply(Fiber, Company, mean)
+```
+
+To find standard dev.:
+```{r}
+tapply(Fiber, Company, sd)
+```
+
+To find the summary of fiber contents:
+```{r}
+tapply(Fiber, Company, summary)
+```
+
+```{r}
+#install.packages("dplyr")
+library(dplyr)
+group_by(cereal, Company) %>%
+  summarize(
+    count = n(),
+    mean = mean(Fiber, na.rm = TRUE),
+    sd = sd(Fiber, na.rm = TRUE)
+  )
+```
+
+b. Create a plot of side-by-side boxplots.  Comment on whether you are seeing any potential differences in the mean number of grams of fiber per serving, based on the three different companies.
+
+```{r}
+boxplot(Fiber ~ Company)
+```
+
+This is nothing more than a visual representation of what we saw (numerically) above. Company `G` has a mean of `~1.5`, company `K` has a mean of `~1.8`, and `Q` has a mean of `~2.6`. Obviously, the most significant difference would be revolving around company `Q`, but no MAJOR differences in the mean number of grams of fiber per serving exist. 
+
+### 2
+*Check to see if the conditions for ANOVA are met. Interpret your results in the context of this problem, using complete sentence(s). State any limitations to using the traditional ANOVA test.*
+
+From the lecture examples, we can use `tapply` to "mass-call" the `qqnorm` function. This would be "step 1" of the condition checking, where we can visually check the normality of the companies' fiber distribution.
+```{r}
+tapply(Fiber, Company, qqnorm)
+```
+
+Step two of the test for applicability, we need to check the "homogeneity" of the different groups--Aka, we're checking for the variance within the groups. To do this, we can use the `leveneTest` function as discussed in the lecture.
+```{r}
+#install.packages("car")
+library("car")
+leveneTest(Fiber ~ Company, data = cereal)
+```
+
+As we just found out with both of the above tests,
+(a) There is not the minimum required amount of 30 observations per group
+OR
+(b) The data must be normally distributed
+These requirements are not met with our data, and will affect the ANOVA test.
+
+### 3
+*State the hypotheses for this ANOVA using either words or symbols.*
+
+a.    H<sub>0</sub>: All of the companies have the same level of fiber per serving. (I.E. `K$Fiber` = `G$Fiber` = `Q$Fiber`)
+b.    H<sub>A</sub>: There are differences among the number grams of fiber per serving. (I.E. `K` != `G` || `Q` != `K` || `G` != `Q`, vise-versa)
+
+### 4
+*Perform the ANOVA and two way comparisons.*
+
+a.  Interpret the results of your ANOVA table in the context of this problem, using complete sentence(s).
+
+```{r}
+aov.all <- aov(Fiber ~ Company, data = cereal)
+```
+
+```{r}
+summary(aov.all)
+```
+
+The main statistic that we're interested in is the `F value` provided in the above table. The `F-value` or `F-statistic` is a representation of a ratio of th varaibility between groups to the average variability within groups. With that being said; Evaluating mainly the F-statistic of `~0.69` given from the above command, we can see that there is a slight varability between the given groups `G`, `Q`, and `K` in measuring the fiber content per serving. 
+
+b.  Interpret the results of your two-way comparisons in the context of this problem, using complete sentence(s).
+
+```{r}
+TukeyHSD(aov.all)
+```
+
+This two-way comparison using the Tukey method allows us to see which groups are different and what the significance is between the differences. Starting with the `K-G` analysis, we can see that the range is (`-1.64`, `2.24`) with a P-value of `0.92`. Based on this, we can conclude there is a little difference between the `K` to `G` groups. Moving on, we see that the `Q-G` range is (`-1.23`, `3.42`) with a p-value of `0.48`. We can conclude there is once again a difference, but a minor one. Last, we have `Q-K` with a range of (`-1.59`, `3.19`) and a p-value of `0.69`. The fairly large p-value could lead us to conclude there is a minor (insignificant) difference among these two groups. 
+
+### 5
+*Perform an analysis of the power of this test.  Comment on the power of this test.   What could be done to improve the power?  What other limitations, if any, do you note in this test?*
+
+```{r}
+#install.packages("sjstats")
+library("sjstats")
+effectsize::eta_squared(aov.all)
+```
+
+```{r}
+#install.packages("pwr")
+library("pwr")
+pwr.anova.test(k = 3, sig.level = 0.05, f = 0.05, n = 10, power = NULL)
+```
+
+```{r}
+pwr.anova.test(k = 3, sig.level = 0.05, f = 0.05, n = NULL, power = 0.8)
+```
+
+If we need to improve the power of the test, we can gather more observations.
+### 6
+*Refer to your answers in #2 and 5.  Comment on whether or not a non-parametric test would be a better option for this data.  Why or why not?*
+
+```{r}
+kruskal.test(Fiber ~ Company, data = cereal)
+```
+
+Based on the output above from the Kurskal-Wallis rank sum test, we know that there is a difference between the three groups listed above. With that being said, a non-parametric test would likely be the better approach for our dataset; As we need to see WHICH groups differ significantly, not just that they DO. 
