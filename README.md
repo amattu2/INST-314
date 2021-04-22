@@ -11,6 +11,7 @@ Teachers:
 |lab1|-|Code correct, some documentation issues|
 |lab2|87%|Code correct, data visualization complaints|
 |lab3|||
+|lab4|||
 
 # Project Grades
 
