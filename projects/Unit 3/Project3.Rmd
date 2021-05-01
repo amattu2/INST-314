@@ -1,0 +1,443 @@
+---
+title: "Unit Project 3 Project"
+authors: 201 Team1, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar
+  Randolph
+date: "05/09/2021"
+output:
+  html_document:
+    df_print: paged
+---
+**To:** Dr. Random
+
+**From:** 201Team1, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar Randolph
+
+**Subject:** Analysis of 110 automotive vehicle models from 2015
+
+
+## Background
+Our 2015 Vehicle Model Year Dataset is derived from data provided and compiled by KBB.com in 2015. Within this detailed analysis of our dataset, we want to derive inferences on various levels of means and proportions. Our population of interest revolves around vehicle models available in the United States during the 2015 new model release cycle (2015 model year). A snapshot of our dataset features and attributes is included below, with example values:
+
+### Table Code
+```{md}
+|  Variable | Name|Example|Type (Quant. / Cat.)|
+|:---------|:------------------------------------------|:----------------------------:|:-|
+|    Make   | Vehicle manufacturer                              | Toyota                       |Categorical|
+|   Model   | Vehicle model                                     | Prius                        |Categorical|
+|    Type   | Vehicle category                                  | Hatchback |Categorical|
+|  LowPrice | Lowest MSRP Available (In 1000s)                  | 6.5                          |Quant.|
+| HighPrice | Highest MSRP Available (In 1000s)                 | 9.5                          |Quant.|
+| Drive     | Vehicle output driveaxle                          | FWD                          |Categorical|
+| CityMPG   | City miles per gallon avg                         | 36                           |Quant.|
+| HwyMPG    | Highway miles per gallon avg                      | 44                           |Quant.|
+| FuelCap   | Gas tank capacity in gallons                      | 12.5                         |Quant.|
+| Length    | Bumper-to-bumper vehicle length (Inch)            | 178.5                        |Quant.|
+| Width     | Door-to-door vehicle width (Inch)                 | 69.2                         |Quant.|
+| Height    | Vehicle height from ground-to-roof (Inch)         | 58.1                         |Quant.|
+| Wheelbase | Vehicle wheelbase (Inch)                          | 106.5                        |Quant.|
+| UTurn     | Vehicle 180deg U-turn radius (Feet)               | 16                           |Quant.|
+| Weight    | Vehicle dry weight (Lbs)                          | 2200                         |Quant.|
+| Acc030    | Vehicle accel. to 30mph (Seconds)                 | 62                           |Quant.|
+| Acc060    | Vehicle accel. to 60mph (Seconds)                 | 190                          |Quant.|
+| QtrMile   | Vehicle time in seconds to 1/4th mile             | 92                           |Quant.|
+| Size      | Vehicle size (Small, Midsized, Large)             | Large                        |Categorical|
+```
+
+### Table of Variables
+|  Variable |Name|Example|Type (Quant. / Cat.)|
+|:---------|:----------------------------|:---------------:|:-|
+|    Make   | Vehicle manufacturer                              | Toyota                       |Categorical|
+|   Model   | Vehicle model                                     | Prius                        |Categorical|
+|    Type   | Vehicle category                                  | Hatchback |Categorical|
+|  LowPrice | Lowest MSRP Available (In 1000s)                  | 6.5                          |Quant.|
+| HighPrice | Highest MSRP Available (In 1000s)                 | 9.5                          |Quant.|
+| Drive     | Vehicle output driveaxle                          | FWD                          |Categorical|
+| CityMPG   | City miles per gallon avg                         | 36                           |Quant.|
+| HwyMPG    | Highway miles per gallon avg                      | 44                           |Quant.|
+| FuelCap   | Gas tank capacity in gallons                      | 12.5                         |Quant.|
+| Length    | Bumper-to-bumper vehicle length (Inch)            | 178.5                        |Quant.|
+| Width     | Door-to-door vehicle width (Inch)                 | 69.2                         |Quant.|
+| Height    | Vehicle height from ground-to-roof (Inch)         | 58.1                         |Quant.|
+| Wheelbase | Vehicle wheelbase (Inch)                          | 106.5                        |Quant.|
+| UTurn     | Vehicle 180deg U-turn radius (Feet)               | 16                           |Quant.|
+| Weight    | Vehicle dry weight (Lbs)                          | 2200                         |Quant.|
+| Acc030    | Vehicle accel. to 30mph (Seconds)                 | 62                           |Quant.|
+| Acc060    | Vehicle accel. to 60mph (Seconds)                 | 190                          |Quant.|
+| QtrMile   | Vehicle time in seconds to 1/4th mile             | 92                           |Quant.|
+| Size      | Vehicle size (Small, Midsized, Large)             | Large                        |Categorical|
+
+
+## Analyses
+```{r}
+# Fixes a HTML compilation bug (ignore)
+r = getOption("repos")
+r["CRAN"] = "http://cran.us.r-project.org"
+options(repos = r)
+```
+
+### Analysis 1: Chi-square Test of Independence
+#### Analyst: Yiling Du
+
+
+Topic for Analysis 1: test for the association between "Drive" variable and "Size" variable. Drive: the type of drive (FWD, RWD,AWD); Size: the size of car (Small, Midsized, Large). Each variable has three categories.
+
+
+First, call the packages that are needed for the analysis:
+```{r}
+library(tidyverse)
+#install.packages("sjstats")
+library (sjstats)
+library (pwr)
+install.packages("car")
+library (car)
+```
+
+
+Load Data:
+```{r}
+cars <- read.csv("./Cars2015.csv", header=T)
+cars
+str(cars)
+```
+
+
+View Data:
+```{r}
+dim(cars)
+head(cars)
+tail(cars)
+glimpse(cars)
+```
+
+
+In this analysis, I'm going to look for an association between Drive and Size.
+Drive should be categorical (factor), but is improperly assigned as a character variable.
+Size should be categorical (factor), but is improperly assigned as a character variable.
+I will change the data type in the below.
+
+Show the code for variable extraction and clean-up:
+First step:  extract the variables that I want to use and assign to a dataframe.
+Second step: retain only observations with values for both variables
+Third step: transform Drive to factor
+Fourth step:  transform Size to factor
+Fifth step:  view the results
+```{r}
+mydata<- cars %>%
+  select(Drive, Size)%>%
+  filter(!is.na(Drive), !is.na(Size))
+ glimpse(mydata)
+ class(mydata$Drive)
+ class(mydata$Size)
+```
+```{r}
+mydata$Drive <- as.factor(mydata$Drive)
+class(mydata$Drive)
+levels(mydata$Drive)
+```
+```{r}
+mydata$Size <- as.factor(mydata$Size)
+class(mydata$Size)
+levels(mydata$Size)
+```
+```{r}
+head(mydata)
+```
+
+
+Create a table from the data (mydata):
+```{r}
+mytable<- table(mydata$Drive, mydata$Size)
+mytable
+```
+
+
+Determine whether the data meets the conditions for performing a chi-square test of independence:
+1: Independence, means each case that contributes a count to the table must be independent of all the other cases in the table. The data meets the independence condition.
+2: Sample size, each particular cell must have at least 5 cases. The data meets the sample size condition.
+3: degree of freedom, d.f should grater than 1. The data meets the d.f condition.
+
+
+Apply the chisq test to the table:
+```{r}
+chisq.test(mytable)
+```
+
+
+Discussion/Interprettion:
+1: explanatory variable: Drive (type of drive); response variable: Size (the size of a car).
+2: Conditions:
+a: Independence, means each case that contributes a count to the table must be independent of all the other cases in the table. The data meets the independence condition because each case is independent of other cases in the table.
+b: Sample size, each particular cell must have at least 5 cases. Each cell have at least 5 cases in the contingency table, so the data meets the sample size condition.
+c: degree of freedom, d.f should grater than 1. The data meets the d.f condition, d.f=(3-1)*(3-1)=4.
+3: State Ho and Ha
+Ho: The type of drive and the size of a car are independent (no association).
+Ha: The type of drive and the size of a car are dependent (association).
+4: X-squared = 4.1017, p-value = 0.3924, p-value > alpha=0.05, so fail to reject the null hypothesis.
+5: There is no significant evidence to conclude that there is an association between the type of a drive and the size of the car.
+6: Limitation: the data meets all the conditions for Chi-square Test of Independence, but the sample size (110) is still small comparing to all cars in the year of 2015, so the current sample size is not representative enough for all cars.
+
+
+
+
+### Analysis 2: Name/description]
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+
+```{r}
+
+```
+
+
+
+
+### Analysis 3:[Name/Description]
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+### Analysis 4: MLR (Two quantitative variables, 1 response variable)
+#### Analyst: Alec Mattu
+
+##### Preface, Setup
+Preface: We need to reference the appropriate packages.
+```{r}
+library(tidyverse)
+library(car)
+```
+
+Let's begin the analysis by importing the Cars 2015 (Model year subset) dataset and cleaning rows with missing values.
+```{r}
+# Load Data
+cars <- read.csv("./Cars2015.csv")
+```
+
+As a quick recap of the data, let's take a look at the various features in the dataset.
+```{r}
+# View Dimensions of the data
+dim(cars)
+
+# View column names
+names(cars)
+str(cars)
+
+# View first few rows of data
+head(cars)
+
+# View last few rows of data
+tail(cars)
+```
+
+##### Hypothesis/Summary
+In this modern world that we live in, where fuel efficiency technology and manufacturering technology is constantly improving, what can we derive from analyzing the EPA rated City mpg on vehicles? I suspect that we can draw conclusions on what type of fuel tank capacity is required or how heavy a particular vehicle is based just off of the EPA rated fuel efficency.
+
+$H_0$: There is a strong correlation between the city miles-per-gallon EPA rating on a vehicle and the fuel tank capacity (gal) as well as the vehicle dry-weight (lbs). I propose that we will see a negatively correlated linear relationship between the City MPG and the Fuel Capacity / Weight of a vehicle.
+
+$H_A$: There is a insignificant or non-existent correlation between a vehicle's EPA rated City MPG and the fuel tank capacity / dry-weight.
+
+##### Response Variable
+The chosen response variable for this analysis will be `CityMPG`; To begin our actual analysis, let's visualize the data behind this variable.
+```{r}
+ggplot(data = cars) +
+  xlab("EPA Rated City Mpg") +
+  geom_boxplot(mapping = aes(x = CityMPG))
+ggplot(data = cars) +
+  xlab("EPA Rated City Mpg") +
+  geom_histogram(mapping = aes(x = CityMPG), binwidth = 0.75)
+```
+
+From both of the above graphics, we can see that a majority of the observations in the dataset revolve around the ~20mpg area. There are a few concerning outliers above 30mpg, so let's dig deeper into those outliers before continuing.
+
+```{r}
+cars_tibble <- as_tibble(cars[1:8])
+cars_tibble %>% filter(CityMPG > 30)
+```
+
+From what we can see above, although these outliers originally appeared to be incorrect data, we can make the assumption that they are in fact correct. Not only can we fact check this ([2015 Mirage MPG](https://www.google.com/search?q=2015+mirage+mpg&oq=2015+mirage+mpg) | [2015 Versa Note MPG](https://www.google.com/search?q=2015+versa+note+mpg)), we can also base our assumption off of the fact that they are both relatively small hatchbacks and compare that to similar vehicles in that category.
+
+##### Explanatory Variable 1
+In order to find predictors of our response variable (`CityMPG`), let's use a correlation matrix. Although this was generalized previously, we need to find the finite list of columns which are numerical in order to predict the response variable. We're going to approach this model building from the "bottom up", where we find highly correlated variables and work from there.
+
+```{r}
+# Pull the complete columns from the dataset
+numerical_columns <- cars[complete.cases(cars), ]
+
+# Pull the complete numerical columns from the dataset
+# Correlation matrix
+complete_numerical_columns <- numerical_columns[, sapply(numerical_columns, is.numeric)]
+print(round(cor(complete_numerical_columns), 2))
+
+# Covariance matrix
+print(round(cov(complete_numerical_columns), 2))
+```
+
+From the correlation display above, we can see quite a few correlations between `CityMPG` and other numerical variables. Let's start with the correlation between `CityMPG` and `FuelCap`. This is an interesting combination of variables because they are NEGATIVELY correlated with eachother. To be precise, they are correlated at `-0.77`--Which is logical, as `CityMPG` increases, the need for a higher gasoline capacity decreases (More fuel efficient).
+
+Let's analyze this relationship with a simple linear model.
+
+```{r}
+model1 <- lm(CityMPG ~ FuelCap, data = complete_numerical_columns)
+summary(model1)
+```
+
+We can see from the above calculations that both our regular p-value and anova f-statistic P-value is extremely small `2e-16`, which is a good indication of a predictor variable. Additionally the $R^2$ value of `~0.60` (60%) isn't fantastic, but it isn't too weak to account for variability in the response variable.
+
+Let's visualize the above correlations .
+
+```{r}
+ggplot(data = complete_numerical_columns, aes(x = CityMPG, y = FuelCap), na.rm = TRUE) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+Next let's run the standard residuals diagnostics on our first predictor variable.
+
+```{r}
+# Check for linearity
+plot(model1$residuals ~ complete_numerical_columns$FuelCap)
+abline(h = 0, lty = 3)
+
+# Check for normality (1/2)
+hist(model1$residuals)
+
+# Check for normality (2/2)
+qqnorm(model1$residuals)
+qqline(model1$residuals)
+```
+
+
+From the above three diagrams, we can conclude:
+
+a) The variable likely does not meet the linearity requirements; The response variable is not evenly scattered, and heavily condensed around the 15-20gal range (Linearity)
+
+b) Based off of the histogram, we can see the distribution is relatively normal (Normality)
+
+c) Similar to our linearity requirement, we don't neccesarily have equal variance as required. (Equal variance)
+
+##### Explanatory Variable 2
+Let's add the final predictor variable. The next highest correlated variable we can choose without affecting the multicollinearity would be vehicle weight (`cars$Weight`). Before digging too deep into this additonal variable on our model, we can build a pairwise scatterplot of the three variables to see how they interact.
+
+```{r}
+plot(cars[c(7, 9, 15)])
+```
+
+As we did with the original model, let's create a new variable which holds a model that accounts for this additional explanatory variable.
+
+```{r}
+model2 <- lm(CityMPG ~ Weight, data = complete_numerical_columns)
+summary(model2)
+```
+
+As with the first explanatory variable, the p-value is extremely small (`2e-16`), which is a great sign that it's statistically significant. Our $R^2$ value is also decently high at `~0.68`, which equates to a reasonably strong correlation between the two variables `CityMPG` and `Weight`.
+
+Let's visualize the calculations above.
+```{r}
+ggplot(data = complete_numerical_columns, aes(x = CityMPG, y = Weight), na.rm = TRUE) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+We can see almost the same data trend as with `FuelCap` in this graph. Following suite to the standard diagnostic procedures we performed for the first model, let's run through a few diagnostics to ensure our predicted explanatory variable works well.
+
+```{r}
+# Check for linearity
+plot(model2$residuals ~ complete_numerical_columns$Weight)
+abline(h = 0, lty = 3)
+```
+
+The data does display some trending, but it's spread considerably better than model1. Let's check for normality among distribution.
+
+```{r}
+# Check for normality (1/2)
+hist(model2$residuals)
+```
+
+The data does appear to be somewhat centered around zero, with a slight right-tail. Using `qqnorm` we can check for normality in a different way.
+
+```{r}
+# Check for normality (2/2)
+qqnorm(model2$residuals)
+qqline(model2$residuals)
+```
+
+Once again from the above diagrams, we can conclude:
+
+a) The data appears to meet linearity requirements, as it's scattered across the plane
+
+b) The distribution is relatively normal meeting normality requirements
+
+c) We appear to have equal variance, at least for the most part meeting the third requirement of equal variance.
+
+##### Final Regression Model
+Pulling all of this data together, let's build the final model with `FuelCap` and `Weight` as the explanatory variables and `CityMPG` as the response variable.
+
+```{r}
+model3 <- lm(CityMPG ~ FuelCap + Weight, data = complete_numerical_columns)
+summary(model3)
+```
+
+With this additional explanatory variable included, we can see our $R^2$ value has actually jumped quite a decent amount to `~0.69` which is considered to be a moderately strong correlation.
+
+As a quick recap of the model diagnostics, we can run a residual error calculation to see the percentage of error in our model's calculations.
+
+```{r}
+print(sigma(model3) / mean(complete_numerical_columns$CityMPG))
+```
+
+We're sitting at a relatively low `0.12%` residual error percentage. Next in line for diagnostics, we can run the following four tools.
+
+```{r}
+# Analysis of Variance
+anova(model3)
+
+# Outliers (Bonferonni)
+outlierTest(model3)
+
+# QQ Plot
+qqPlot(model3, main = "QQ Plot")
+
+# Leverage Points in data
+leveragePlots(model3)
+```
+
+Both the anova and bonferonni tests come up indicating that we have no significant issues with outliers in our dataset or analysis. Additionally, if we wanted to test the variance across multiple different models, we could run the anova test with each different model (I.E. `anova(model1, model2)`). However, because I built the model from the ground up, I don't need to throw in guesswork as to which model would be most appropriate for this task.
+
+##### Summary
+We do see a strong correlation between the `CityMPG`, `Weight`, and `FuelCap` variables. I am failing to reject the null hypothesis ($H_0$) due to this fact. See Recommendations below for a more in-depth summary.
+
+### Analysis 5:[Name/description]
+#### Analyst:[Name of Team Member]
+
+[Put text of analysis here and add as many code chunks and text sections as you need.]
+
+```{r}
+
+```
+
+
+## Recommendations
+##### Analysis 1:
+my estimate is the type of drive and the size of a car are dependent, I thought AWD cars' size will larger than FWD cars and RWD cars. However, analysis#1 proves my guess is wrong. Based on the sample data, we get there is no significant evidence to conclude that there is an association between the type of drive and the size of the car at the 95% confidence level. One limitation in my finding is the sample size is not representative enough for all cars in 2015.
+
+##### Analysis 2:
+
+##### Analysis 3:
+
+##### Analysis 4:
+My goal in the analysis was to prove a relationship between the response variable City MPG and explanatory variables Dry Weight and Fuel Tank Capacity. The efforts to do so were successful, and there was found to be a negative correlation between the `CityMPG`:`FuelCap`. This relationship is nothing short of expected, as the fuel efficiency of a engine increases, one would expect that the need for a larger fuel tank decreases. Beyond fuel tank capacity, I also found that there was once again a negative linear correlation between `CityMPG`:`Weight`; As the `CityMPG` went up, the vehicle's weight went down. Need I repeat, this was not unexpected, heavy vehicles need larger engines, and larger engines mean more fuel consumption (Lower MPGs). I don't believe there are any limitations to the findings in this dataset, the only future limitation would be if eMPG (Electric simulated MPG) were included (I.E. Telas/Chevy Volt). This  addition would skew the data in many unfavorable ways. I would suspect that this analysis did not present any new findings to the reader, as it's all basic logic.
+
+##### Analysis 5:
+
+[Add text section with your recommendations here. In this section, you will briefly  summarize the conclusions of your estimates and tests. What statistically significant findings did you have?  What limitations are there in your findings?  Discuss if/how this is relevant in the context of your data – does it give us new insights ? Help us to better understand some phenomenon?  Or not?]
+
+## Reflections
+##### Alec Mattu:
+I would say that the three unit projects significantly expanded my understanding of performing statistical analyses. Not only did it provide and opportunity to perform three independent analyses on the same dataset from different perspectives, it also provided the chance to view fellow student's ways of performing statistical functions and tasks. In summary, these past three projects allowed me to personally explore: Analysis on a single categorical variable, draw inferences on a single categorical proportion, and finally, multiple linear regression on two quantitative variables and one response variable. While I learned a plethora of things from unit projects, I would say that the most important is how to implement linear regression on multiple variables (categorical and numerical). Thankfully, I personally faced very few challenges when completing these unit projects--The only initial hiccup was setting up proper `.Rmd` file exporting to HTML/PDFs.
+
+[Add text section on your reflections about unit projects. Be sure to address each of the prompts on the instruction sheet.
+a. What impact did the Unit Projects have on your understanding of statistics? b. What new knowledge did you gain about your statistical analyses? Briefly explain.c.  What did you learn by creating the unit projects? d.  What challenges did you face completing the unit projects? ]
