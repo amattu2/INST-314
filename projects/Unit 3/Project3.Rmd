@@ -1,6 +1,6 @@
 ---
 title: "Unit Project 3 Project"
-authors: 201 Team1, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar
+authors: 201Team1, Yiling Du, Bryce Hawkins, Onyekachi Igwenagu, Alec Mattu, Delmar
   Randolph
 date: "05/09/2021"
 output:
@@ -121,7 +121,7 @@ Third step: transform Drive to factor
 Fourth step:  transform Size to factor
 Fifth step:  view the results
 ```{r}
-mydata<- cars %>%
+mydata<- cars %>% 
   select(Drive, Size)%>%
   filter(!is.na(Drive), !is.na(Size))
  glimpse(mydata)
@@ -234,7 +234,7 @@ tail(cars)
 ```
 
 ##### Hypothesis/Summary
-In this modern world that we live in, where fuel efficiency technology and manufacturering technology is constantly improving, what can we derive from analyzing the EPA rated City mpg on vehicles? I suspect that we can draw conclusions on what type of fuel tank capacity is required or how heavy a particular vehicle is based just off of the EPA rated fuel efficency.
+In this modern world that we live in, where fuel efficiency technology and manufacturering technology is constantly improving, what can we derive from analyzing the EPA rated City mpg on vehicles? I suspect that we can draw conclusions on what type of fuel tank capacity is required or how heavy a particular vehicle is based just off of the EPA rated fuel efficency. 
 
 $H_0$: There is a strong correlation between the city miles-per-gallon EPA rating on a vehicle and the fuel tank capacity (gal) as well as the vehicle dry-weight (lbs). I propose that we will see a negatively correlated linear relationship between the City MPG and the Fuel Capacity / Weight of a vehicle.
 
@@ -251,7 +251,7 @@ ggplot(data = cars) +
   geom_histogram(mapping = aes(x = CityMPG), binwidth = 0.75)
 ```
 
-From both of the above graphics, we can see that a majority of the observations in the dataset revolve around the ~20mpg area. There are a few concerning outliers above 30mpg, so let's dig deeper into those outliers before continuing.
+From both of the above graphics, we can see that a majority of the observations in the dataset revolve around the ~20mpg area. There are a few concerning outliers above 30mpg, so let's dig deeper into those outliers before continuing. 
 
 ```{r}
 cars_tibble <- as_tibble(cars[1:8])
@@ -266,7 +266,7 @@ In order to find predictors of our response variable (`CityMPG`), let's use a co
 ```{r}
 # Pull the complete columns from the dataset
 numerical_columns <- cars[complete.cases(cars), ]
-
+  
 # Pull the complete numerical columns from the dataset
 # Correlation matrix
 complete_numerical_columns <- numerical_columns[, sapply(numerical_columns, is.numeric)]
@@ -276,7 +276,7 @@ print(round(cor(complete_numerical_columns), 2))
 print(round(cov(complete_numerical_columns), 2))
 ```
 
-From the correlation display above, we can see quite a few correlations between `CityMPG` and other numerical variables. Let's start with the correlation between `CityMPG` and `FuelCap`. This is an interesting combination of variables because they are NEGATIVELY correlated with eachother. To be precise, they are correlated at `-0.77`--Which is logical, as `CityMPG` increases, the need for a higher gasoline capacity decreases (More fuel efficient).
+From the correlation display above, we can see quite a few correlations between `CityMPG` and other numerical variables. Let's start with the correlation between `CityMPG` and `FuelCap`. This is an interesting combination of variables because they are NEGATIVELY correlated with eachother. To be precise, they are correlated at `-0.77`--Which is logical, as `CityMPG` increases, the need for a higher gasoline capacity decreases (More fuel efficient). 
 
 Let's analyze this relationship with a simple linear model.
 
@@ -381,7 +381,7 @@ model3 <- lm(CityMPG ~ FuelCap + Weight, data = complete_numerical_columns)
 summary(model3)
 ```
 
-With this additional explanatory variable included, we can see our $R^2$ value has actually jumped quite a decent amount to `~0.69` which is considered to be a moderately strong correlation.
+With this additional explanatory variable included, we can see our $R^2$ value has actually jumped quite a decent amount to `~0.69` which is considered to be a moderately strong correlation. 
 
 As a quick recap of the model diagnostics, we can run a residual error calculation to see the percentage of error in our model's calculations.
 
@@ -420,6 +420,7 @@ We do see a strong correlation between the `CityMPG`, `Weight`, and `FuelCap` va
 ```
 
 
+
 ## Recommendations
 ##### Analysis 1:
 my estimate is the type of drive and the size of a car are dependent, I thought AWD cars' size will larger than FWD cars and RWD cars. However, analysis#1 proves my guess is wrong. Based on the sample data, we get there is no significant evidence to conclude that there is an association between the type of drive and the size of the car at the 95% confidence level. One limitation in my finding is the sample size is not representative enough for all cars in 2015.
@@ -437,7 +438,10 @@ My goal in the analysis was to prove a relationship between the response variabl
 
 ## Reflections
 ##### Alec Mattu:
-I would say that the three unit projects significantly expanded my understanding of performing statistical analyses. Not only did it provide and opportunity to perform three independent analyses on the same dataset from different perspectives, it also provided the chance to view fellow student's ways of performing statistical functions and tasks. In summary, these past three projects allowed me to personally explore: Analysis on a single categorical variable, draw inferences on a single categorical proportion, and finally, multiple linear regression on two quantitative variables and one response variable. While I learned a plethora of things from unit projects, I would say that the most important is how to implement linear regression on multiple variables (categorical and numerical). Thankfully, I personally faced very few challenges when completing these unit projects--The only initial hiccup was setting up proper `.Rmd` file exporting to HTML/PDFs.
+I would say that the three unit projects significantly expanded my understanding of performing statistical analyses. Not only did it provide and opportunity to perform three independent analyses on the same dataset from different perspectives, it also provided the chance to view fellow student's ways of performing statistical functions and tasks. In summary, these past three projects allowed me to personally explore: Analysis on a single categorical variable, draw inferences on a single categorical proportion, and finally, multiple linear regression on two quantitative variables and one response variable. While I learned a plethora of things from unit projects, I would say that the most important is how to implement linear regression on multiple variables (categorical and numerical). Thankfully, I personally faced very few challenges when completing these unit projects--The only initial hiccup was setting up proper `.Rmd` file exporting to HTML/PDFs. 
+
+##### Yiling Du:
+Three Unit Projects help me to use the statistics knowledge I learned in class in a real data file. I learned how to use R language to analyze big data. Because of the Unit projects, I got more familiar to write R code. In addition, I learned we can get a lot of information through analyzing a data file, such as we made five different analyses for each unit project and we have different interesting findings for each analysis. I have not faced many challenges in completing the unit projects because the R demo videos cover most of the skills to use R.
 
 [Add text section on your reflections about unit projects. Be sure to address each of the prompts on the instruction sheet.
 a. What impact did the Unit Projects have on your understanding of statistics? b. What new knowledge did you gain about your statistical analyses? Briefly explain.c.  What did you learn by creating the unit projects? d.  What challenges did you face completing the unit projects? ]
