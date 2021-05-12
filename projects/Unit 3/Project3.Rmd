@@ -178,28 +178,183 @@ Ha: The type of drive and the size of a car are dependent (association).
 
 
 
-### Analysis 2: Name/description]
-#### Analyst:[Name of Team Member]
+### Analysis 2: [Analysis of Variance]
+#### Analyst:[Onyekachi Igwenagu]
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
+Analysis 2 Topic: A test using the variables "Make and "FuelCap". The "Make" variable has upto two catagories: Acura, Chevrolet 
 
+Now install the packages neeeded in order to complete our analysis. 
 
 ```{r}
+library (dplyr)
+library (sjstats)
+library (car)
+library (pwr)
+```
+
+Load in our data into R
+```{r}
+cars <- read.csv("./Cars2015.csv", header=T)
+cars
+```
+
+
+Looking theought the the contents in the data. 
+```{r}
+mycat<- cars %>% 
+select(FuelCap, Make)%>%
+filter(!is.na(FuelCap), !is.na(Make))
+head(cars)
+attach(cars)
+glimpse(cars)
+dim(cars)
+str(cars)
+```
+
+
+Im looking for the relationship between the variiables FuelCap and Make for in the data.Looking for a chaningin difference in the mean and standard deviation. The potentical catagorical explantory variable is Make and the quntitaive response variable is the FuelCap.  
+```{r}
+head(mycat)
+names(mycat)
+str(mycat)
+summary(mycat)
+sd(mycat$FuelCap)
+tapply (mycat$FuelCap, mycat$Make, mean)
+tapply (mycat$FuelCap, mycat$Make, sd)
+tapply (mycat$FuelCap, mycat$Make, summary)
+```
+
+```{r}
+group_by(cars, Make) %>%
+summarise(
+count = n(),
+mean = mean(FuelCap, na.rm = TRUE),
+sd = sd(FuelCap, na.rm = TRUE))
+summary(mycat)
+```
+
+After summarizing the variables and looking at the graph, there looks to not be a  difference in the means of the sample size.. 
+
+```{r}
+qqnorm(mycat$FuelCap)
+qqline(mycat$FuelCap)
+
 
 ```
 
 
-
-
-### Analysis 3:[Name/Description]
-#### Analyst:[Name of Team Member]
-
-[Put text of analysis here and add as many code chunks and text sections as you need.]
-
 ```{r}
+aov(mycat$FuelCap~mycat$Make, data = mycat)
+anova.all = aov(mycat$FuelCap~mycat$Make, data = mycat)
+summary(anova.all)
 
 ```
 
+
+```{r}
+TukeyHSD(anova.all)
+```
+
+```{r}
+eta_sq(anova.all)
+```
+
+```{r}
+pwr.anova.test(k=2, sig.level=0.05, f=1.321, n=10, power=NULL)
+
+```
+
+
+The explantory variable for this analysis is "Make" of the vehicels and the response variable is the FuelCap for each respective car Make. Before conduction the Analysis of Variance test the conditions where met. There was no significant difference in the mean for the Make. With the Test, we check the similarity of variance. The null is no difference in variances in all the groups involved. For the Hypothesis, Ho: muG_Make = muK_Make = muQ_Make, all the same Ha: mu≠mu, no difference can be seen so we do not reject the null. The p value from our summary calculations is 1.312. Power test is relevant because it allows you to determine the sample size required to detect an effect of a given size with a given degree of confidence level. There were not as many outliers in this data analysis all the outputs where all around the same level so there was not much change to the mean.  
+
+
+
+
+### Analysis 3:Simple Linear Regression Between Two Quantitative Variables (CityMPG, Weight) 
+#### Analyst:Bryce Hawkins
+
+Before we begin, let's install the needed packages for the analysis:
+```{r}
+library(readr)
+library(ggplot2)
+```
+
+Now that we have the packages installed, we will load in the Cars2015 dataset under "cars" and 
+```{r}
+cars <- read.csv("./Cars2015.csv", header=T)
+```
+
+Since Simple Linear Regression deals with two quantitative variables, we will observe both the Weight and CityMPG variables as seen below:
+```{r}
+cars$Weight
+cars$CityMPG
+```
+
+Let's visualize the relationship between the two quantitative variables in the form of a scatterplot:
+```{r}
+ggplot(data = cars) +
+   geom_point((mapping = aes(x=Weight, y=CityMPG, color = "red")))
+```
+Up above, from an eyeball-test we can see that the correlation looks to be strong and negative.
+
+Now we will use the "cor" command to assess the correlation:
+```{r}
+cor(cars$CityMPG, cars$Weight)
+```
+From this assessment, we see that the correlation is indeed strong and negative, as -0.82 is close to -1, a perfect negative correlation.
+
+To see if the data above meet the conditions for a linear model, we need to know what conditions need to be satisfied: 1) Linearity 2) Independent Residuals 3) Normal Residuals 4) Equal/constant Variability. The following tests are diagnostics to see if the data above meet the conditions for a linear model:
+
+Linearity: We need to see if the relationship between the Explanatory variable (Weight) and the Response variable (CityMPG) is linear, using the plot command:
+```{r}
+plot(reg.out$residuals ~ cars$Weight)
+abline(h = 0, lty = 3)
+```
+
+As we can see from above, the relationship between the Explanatory and Response variables is not linear.
+
+Independent Residuals: For the sake of this analysis, we will assume that car Weight and car CityMPG are independent from one another.
+
+Normal Residuals: Next, we will check to see if the residuals in this data are nearly normal using a histogram:
+```{r}
+hist(reg.out$residuals)
+```
+From this histogram, it does not look like the data has normal residuals, as the histogram appears to tail off towards the right.
+
+Equal/Constant Variability: For the last test, we will check to see if the variability of points around the least square line is roughly constant, using the "qqnorm" and "qqline" commands:
+```{r}
+qqnorm(reg.out$residuals)
+qqline(reg.out$residuals)
+```
+From what we see about, this data does meet the Equal/Constant Variability condition, as the points are roughly near the least square line.
+
+
+Now, we will run the linear regression model, using the "lm" command:
+```{r}
+reg.out <- lm(CityMPG ~ Weight, data = cars)
+```
+
+We will summarize the data from the linear regression model down below:
+```{r}
+summary (reg.out)
+```
+Slope Interpretation: As car Weight increases, car CityMPG decreases by -.0043335.
+Intercept Interpretation: When X (car Weight) is equal to 0, the Y (car CityMPG) is 37.4486063.
+
+Discussion/Interpretation:
+1) The explanatory variable used in this dataset is car weight, while the response variable is CityMPG.
+2) There are four conditions to meet for this test, which are Linearity, Independent Residuals, Normal Residuals, and Equal/Constant Variability. When talking about linearity, this condition is not met, as the relationship between the explanatory and response variable is not linear. The independence condition is met, as t6he data in the histogram does not appear to be normally distributed. The equal/constant variability does appear to be met, as data points are rougly near the least square line.
+3)Null Hypothesis: There is not a statistically significant relationship between car weight and   car CityMPG in 2015.
+  Alternative Hypothesis: There is a statistically significant relationship between car weight and car CityMPG in 2015.
+4) The linear regression model correlation can be described as a strong and negative              relationship.
+  Slope Interpretation: As car weight increases, car CityMPG decreases by -0.0043335.
+  Intercept Interpretation: When X (car weight) is equal to 0, the Y (car CityMPG) is 37.4486063.
+5) Test Statistic: 0.05
+   P-value: < 2.2e-16
+   We fail to reject the null hypothesis, as the p-value is significantly lower than the test     statistic.
+   R^2 Interpretation: Weight, as a predictor for CityMPG, accounts for 0.6838% of the            variability we see in CityMPG.
+6) Conclusion: The variables in this dataset fail to meet all conditions for a linear model,      and we can conclude that there is a statistically significant relationship between car         weight and car CityMPG in 2015.
+7) Limitations: All conditions were failed to be met, and there were outliers in this simple      linear regression.
 
 ### Analysis 4: MLR (Two quantitative variables, 1 response variable)
 #### Analyst: Alec Mattu
@@ -234,7 +389,7 @@ tail(cars)
 ```
 
 ##### Hypothesis/Summary
-In this modern world that we live in, where fuel efficiency technology and manufacturering technology is constantly improving, what can we derive from analyzing the EPA rated City mpg on vehicles? I suspect that we can draw conclusions on what type of fuel tank capacity is required or how heavy a particular vehicle is based just off of the EPA rated fuel efficency. 
+In this modern world that we live in, where fuel efficiency technology and manufacturing technology is constantly improving, what can we derive from analyzing the EPA rated City mpg on vehicles? I suspect that we can draw conclusions on what type of fuel tank capacity is required or how heavy a particular vehicle is based just off of the EPA rated fuel efficiency. 
 
 $H_0$: There is a strong correlation between the city miles-per-gallon EPA rating on a vehicle and the fuel tank capacity (gal) as well as the vehicle dry-weight (lbs). I propose that we will see a negatively correlated linear relationship between the City MPG and the Fuel Capacity / Weight of a vehicle.
 
@@ -410,14 +565,186 @@ Both the anova and bonferonni tests come up indicating that we have no significa
 ##### Summary
 We do see a strong correlation between the `CityMPG`, `Weight`, and `FuelCap` variables. I am failing to reject the null hypothesis ($H_0$) due to this fact. See Recommendations below for a more in-depth summary.
 
-### Analysis 5:[Name/description]
-#### Analyst:[Name of Team Member]
+### Analysis 5:[Multiple Regression 2 - One Quantitative/One Categorical Explanatory Variables]
+#### Analyst:[Delmar Wilmont Randolph]
 
-[Put text of analysis here and add as many code chunks and text sections as you need.]
+To begin, we need to import necessary packages.
+```{r}
+#import packages
+library(tidyverse)
+library (sjstats)
+library (pwr)
+install.packages("car")
+library (car)
+```
+Import the Cars 2015 data set and remove rows with any missing values.
+```{r}
+# Load Data
+cars <- read.csv("./Cars2015.csv")
+cars
+```
+[H_0: There is a strong correlation between the high-price of a vehicle, it's fuel capacity, and city MPG. I propose that we will see a positively correlated linear relationship between the high-price, the fuel capacity, and city MPG of a vehicle.
+
+H_A: There is an insignificant or non-existent correlation between a vehicle's high-price, the fuel capacity, and city MPG.]
+
+### Response Variable
+The chosen response variable for this analysis will be `High-Price`; Visualize the data behind this variable.
+```{r}
+ggplot(data = cars) +
+  xlab("High-Price") +
+  geom_boxplot(mapping = aes(x = HighPrice))
+ggplot(data = cars) +
+  xlab("High-Price") +
+  geom_histogram(mapping = aes(x = HighPrice), binwidth = 0.75)
+```
+##### Explanatory Variable 1
+Finding predictors of our response variable (`HighPrice`), requires a correlation matrix. We will find highly correlated variables and work from there.
 
 ```{r}
+# Pull the complete columns from the data set
+numerical_columns <- cars[complete.cases(cars), ]
+  
+# Pull the complete numerical columns from the data set
+# Correlation matrix
+complete_numerical_columns <- numerical_columns[, sapply(numerical_columns, is.numeric)]
+print(round(cor(complete_numerical_columns), 2))
 
+# Covariance matrix
+print(round(cov(complete_numerical_columns), 2))
 ```
+From the data above, we can see some correlations between our response variable and other quantitative / explanatory variables. We will begin with `HighPrice` and `FuelCap`. It is important to note that they are POSITIVELY correlated with each other. Specifically, they are correlated at `0.47`-- which can be expected -- as the price increases, the fuel capacity of the vehicle also increases - reasons for this could be a variety of factors (size, type, etc.)
+
+Let's analyze this relationship with a simple linear model.
+
+```{r}
+model3 <- lm(HighPrice ~ FuelCap, data = complete_numerical_columns)
+summary(model3)
+```
+
+We can see from the above calculations that both our regular p-value and anova f-statistic P-value is over 0.05, specifically around 0.25781, which suggests that changes in the predictor are not associated with changes in the response. Additionally the $R^2$ value of `~0.20` (20%) indicates that our variable does account for much of the variance.
+
+Let's visualize the above correlations .
+
+```{r}
+ggplot(data = complete_numerical_columns, aes(x = HighPrice, y = FuelCap), na.rm = TRUE) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+Next let's run the standard residuals diagnostics on our first predictor variable.
+
+```{r}
+# Check for linearity
+plot(model3$residuals ~ complete_numerical_columns$FuelCap)
+abline(h = 0, lty = 3)
+
+# Check for normality (1/2)
+hist(model3$residuals)
+
+# Check for normality (2/2)
+qqnorm(model3$residuals)
+qqline(model3$residuals)
+```
+
+
+From the data above, we can conclude:
+
+a) The variable does not meet the linearity requirements; The response variable is not evenly scattered, and heavily condensed around the 10-20 range (Linearity)
+
+b) Based off of the histogram, we can see the distribution is somewhat normal (Normality)
+
+c) Similar to our linearity requirement, we do not have equal variance as required. (Equal variance)
+
+##### Explanatory Variable 2
+The next correlated variable we can choose would be the City MPG (`cars$CityMPG`). A visual aid would be beneficial in interpreting this variable.
+```{r}
+plot(cars[c(5, 7, 9)])
+```
+
+Create a new variable which holds a model that accounts for this explanatory variable.
+
+```{r}
+model2 <- lm(HighPrice ~ CityMPG, data = complete_numerical_columns)
+summary(model2)
+```
+
+As with the first explanatory variable, the p-value is larger than 0.05, which shows that it is not statistically significant. Our $R^2$ value is also low at `~0.30`, which equates to a weak correlation between the two variables `HighPrice` and `CityMPG`.
+
+Let's visualize the calculations above.
+```{r}
+ggplot(data = complete_numerical_columns, aes(x = HighPrice, y = CityMPG), na.rm = TRUE) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+We can see there is a NEGATIVE correlation - the higher the price, the less City MPG the vehicle has. Following the previous variable, we need to perform the standard diagnostic procedures we performed for the first model, let's run through a few diagnostics to ensure our predicted explanatory variable works.
+
+```{r}
+# Check for linearity
+plot(model2$residuals ~ complete_numerical_columns$Weight)
+abline(h = 0, lty = 3)
+```
+
+The data does not display any trending, but it's spread considerably better than model1. Let's check for normality among distribution.
+
+```{r}
+# Check for normality (1/2)
+hist(model2$residuals)
+```
+
+The data does appear to be somewhat skewed-right, with a right-tail. Using `qqnorm` we can check for normality in a different way.
+
+```{r}
+# Check for normality (2/2)
+qqnorm(model2$residuals)
+qqline(model2$residuals)
+```
+
+Once again from the above diagrams, we can conclude:
+
+a) The data appears to meet linearity requirements, as it's scattered across the plane
+
+b) The distribution is not normal, not meeting requirements
+
+c) We appear to have equal variance, at least for the most part meeting the third requirement of equal variance.
+
+##### Final Regression Model
+Pulling all of this data together, let's build the final model with `FuelCap` and `CityMPG` as the explanatory variables and `HighPrice` as the response variable.
+
+```{r}
+# Fit a multiple linear regression model for high-price as a function of the city MPG, and fuel tank Capacity
+
+finalMod <- lm(HighPrice ~ CityMPG + FuelCap, data = complete_numerical_columns)
+summary(finalMod)
+```
+With this additional explanatory variable included, we can see our $R^2$ value has remained below 30%, which is a relatively weak correlation.
+
+As a quick recap of the model diagnostics, we can run a residual error calculation to see the percentage of error in our model's calculations.
+
+```{r}
+print(sigma(finalMod) / mean(complete_numerical_columns$HighPrice))
+```
+
+We're sitting at a relatively low `0.48%` residual error percentage. Next in line for diagnostics, we can run the following four tools.
+
+```{r}
+# Analysis of Variance
+anova(finalMod)
+
+# Outliers (Bonferonni)
+outlierTest(finalMod)
+
+# QQ Plot
+qqPlot(finalMod, main = "QQ Plot")
+
+# Leverage Points in data
+leveragePlots(finalMod)
+```
+
+Both the anova and bonferonni test results indicate that we have no significant issues with outliers in our data set or analysis. Additionally, if we wanted to test the variance across multiple different models, we could run the anova test with each different model.
+
+##### Summary
+We do not see a significant correlation between the `HighPrice`, `CityMPG`, and `FuelCap` variables. I reject the null hypothesis due to this fact. See Recommendations below for a more in-depth summary.
 
 
 
@@ -425,7 +752,8 @@ We do see a strong correlation between the `CityMPG`, `Weight`, and `FuelCap` va
 ##### Analysis 1:
 my estimate is the type of drive and the size of a car are dependent, I thought AWD cars' size will larger than FWD cars and RWD cars. However, analysis#1 proves my guess is wrong. Based on the sample data, we get there is no significant evidence to conclude that there is an association between the type of drive and the size of the car at the 95% confidence level. One limitation in my finding is the sample size is not representative enough for all cars in 2015.
 
-##### Analysis 2:
+##### Analysis 2: James Igwenagu
+I thought that the different varity of cars manufacture or make would vary in the Fuel capacity of the different vehicles. Depending on the size of the cars i thought here would be a huge difference in fuelcap. From analysis 2 it shows that there was little to no difference. A limitation i found was that depending on the make of the vehicle the fuel cap was almost the same for all od them and we also have to out into account the brand names of the vehicle and the type of fuel needed. 
 
 ##### Analysis 3:
 
@@ -434,7 +762,7 @@ My goal in the analysis was to prove a relationship between the response variabl
 
 ##### Analysis 5:
 
-[Add text section with your recommendations here. In this section, you will briefly  summarize the conclusions of your estimates and tests. What statistically significant findings did you have?  What limitations are there in your findings?  Discuss if/how this is relevant in the context of your data – does it give us new insights ? Help us to better understand some phenomenon?  Or not?]
+[my estimate is the higher price range of the vehicle would be affected by the City MPG, and Fuel capacity of the vehicle, and proving that the latter two variables are dependent on each other, I thought these two variables would drastically effect the price of the vehicle, however my analyses proved otherwise. Based on the sample data, we conclude there is no significant evidence to verify that there is an association between the City MPG, fuel capacity and price of the vehicle at the 95% confidence level. One limitation in my findings is the sample size is not representative enough for all cars in 2015. If one were to make their car purchase decision based on these variables, one would need to know that they do not correlate to the overall price of the vehicle.]
 
 ## Reflections
 ##### Alec Mattu:
@@ -445,3 +773,9 @@ Three Unit Projects help me to use the statistics knowledge I learned in class i
 
 [Add text section on your reflections about unit projects. Be sure to address each of the prompts on the instruction sheet.
 a. What impact did the Unit Projects have on your understanding of statistics? b. What new knowledge did you gain about your statistical analyses? Briefly explain.c.  What did you learn by creating the unit projects? d.  What challenges did you face completing the unit projects? ]
+
+##### Delmar Randolph:
+I believe that these unit projects have immensely expanded my knowledge of statistics and working with R code. Specifically, from Unit 1 to the latest project, I felt that my skills working in statistics have only improved. Some challenges I faced were the fact that I have not taken a statistics course in a long while. Therefore, I had to re-familiarize myself with the concepts in order to perform adequately in this class. Thankfully, it provided the chance to view fellow student's ways of performing statistical functions and tasks, as well as their methods in thinking and approaching a problem. In summary, these past three projects allowed me to perform various modes of statistical computation and working with big data such as: Analysis on a single categorical variable, draw inferences on a single categorical proportion, and lastly, multiple linear regression on two quantitative variables and one response variable.
+
+##### James Igwenagu
+These projects have shown me yet another way to and platform to use to Calculate statistical data using a data set. I was always use ti using python which is a little harder. R was more Straight forward and easier to understand and use.  I learned a lot about Statistical data Calculations and how to clean and refine it. It was a great experience. I dont know if i will be able to implement using this in the future but it good to have a grounded understanding of it. 
