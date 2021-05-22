@@ -19,7 +19,7 @@ Teachers:
 |:-|:-|:-|
 |Unit 1|Individual: 85%<br/>Group: 82.5%||
 |Unit 2|Individual: 80%<br/>Group: 72.5%||
-|Unit 3|-||
+|Unit 3|Individual: 80%<br/>Group: 87%||
 
 # Notes
 N/A
